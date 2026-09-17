@@ -18,6 +18,7 @@ type AccountService interface {
 	CreateAccount(ctx context.Context, req dto.CreateAccountRequest) (dto.CreateAccountResponse, error)
 	Login(ctx context.Context, req dto.LoginAccountRequest) (dto.LoginAccountResponse, error)
 	GetAccountByID(ctx context.Context, id int64) (dto.AccountResponse, error)
+	RefreshAccessToken(ctx context.Context, refreshToken string) (dto.RefreshTokenResponse, error)
 }
 
 type AccountHandler struct {
@@ -114,4 +115,35 @@ func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpx.RespondWithJSON(w, http.StatusOK, account)
+}
+
+func (h *AccountHandler) RefreshAccessToken(w http.ResponseWriter, r *http.Request) {
+	var req dto.RefreshTokenRequest
+
+	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&req); err != nil {
+		httpx.RespondWithError(w, http.StatusBadRequest, "invalid or oversized request body")
+		return
+	}
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		httpx.RespondWithError(w, http.StatusBadRequest, "request body must only contain a single json object")
+		return
+	}
+
+	if req.RefreshToken == "" {
+		httpx.RespondWithError(w, http.StatusBadRequest, "invalid token")
+		return
+	}
+
+	accessToken, err := h.accountService.RefreshAccessToken(r.Context(), req.RefreshToken)
+	if err != nil {
+		log.Printf("refresh token error: %v", err)
+		httpx.RespondWithError(w, http.StatusUnauthorized, "invalid refresh token")
+		return
+	}
+
+	httpx.RespondWithJSON(w, http.StatusOK, accessToken)
 }

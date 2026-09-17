@@ -5,13 +5,11 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/DAbharat/Sahayak/internal/dto"
 	"github.com/DAbharat/Sahayak/internal/httpx"
+	"github.com/DAbharat/Sahayak/internal/middleware"
 	"github.com/DAbharat/Sahayak/internal/service"
-
-	"github.com/gorilla/mux"
 )
 
 type ProfileService interface {
@@ -30,13 +28,13 @@ func NewProfileHandler(profileService ProfileService) *ProfileHandler {
 	}
 }
 
-func parseAccountID(w http.ResponseWriter, r *http.Request) (int64, bool) {
-	accountID, err := strconv.ParseInt(mux.Vars(r)["accountID"], 10, 64)
-	if err != nil {
+func getAuthenticatedAccountID(w http.ResponseWriter, r *http.Request) (int64, bool) {
+	accountID, ok := middleware.GetUserFromContext(r.Context())
+	if !ok {
 		httpx.RespondWithError(
 			w,
-			http.StatusBadRequest,
-			service.ErrInvalidAccountID.Error(),
+			http.StatusUnauthorized,
+			"unauthorized",
 		)
 		return 0, false
 	}
@@ -45,7 +43,7 @@ func parseAccountID(w http.ResponseWriter, r *http.Request) (int64, bool) {
 }
 
 func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
-	accountID, ok := parseAccountID(w, r)
+	accountID, ok := getAuthenticatedAccountID(w, r)
 	if !ok {
 		return
 	}
@@ -92,7 +90,7 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-	accountID, ok := parseAccountID(w, r)
+	accountID, ok := getAuthenticatedAccountID(w, r)
 	if !ok {
 		return
 	}
@@ -124,7 +122,7 @@ func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	accountID, ok := parseAccountID(w, r)
+	accountID, ok := getAuthenticatedAccountID(w, r)
 	if !ok {
 		return
 	}

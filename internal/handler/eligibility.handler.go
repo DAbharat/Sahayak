@@ -10,6 +10,7 @@ import (
 
 	"github.com/DAbharat/Sahayak/internal/dto"
 	"github.com/DAbharat/Sahayak/internal/httpx"
+	"github.com/DAbharat/Sahayak/internal/middleware"
 	"github.com/DAbharat/Sahayak/internal/service"
 )
 
@@ -28,6 +29,12 @@ func NewEligibilityHandler(eligibilityService EligibilityService) *EligibilityHa
 }
 
 func (h *EligibilityHandler) CheckEligibility(w http.ResponseWriter, r *http.Request) {
+	accountID, ok := middleware.GetUserFromContext(r.Context())
+	if !ok {
+		httpx.RespondWithError(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
 	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
 
 	var req dto.EligibilityRequest
@@ -53,15 +60,6 @@ func (h *EligibilityHandler) CheckEligibility(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if req.AccountID <= 0 {
-		httpx.RespondWithError(
-			w,
-			http.StatusBadRequest,
-			service.ErrInvalidAccountID.Error(),
-		)
-		return
-	}
-
 	if req.SchemeID <= 0 {
 		httpx.RespondWithError(
 			w,
@@ -73,7 +71,7 @@ func (h *EligibilityHandler) CheckEligibility(w http.ResponseWriter, r *http.Req
 
 	result, err := h.eligibilityService.CheckEligibility(
 		r.Context(),
-		req.AccountID,
+		accountID,
 		req.SchemeID,
 	)
 	if err != nil {

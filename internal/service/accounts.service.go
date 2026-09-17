@@ -175,3 +175,45 @@ func (s *AccountService) GetAccountByID(ctx context.Context, id int64) (dto.Acco
 		CreatedAt: account.CreatedAt.Time,
 	}, nil
 }
+
+func (s *AccountService) RefreshAccessToken(ctx context.Context, refreshToken string) (dto.RefreshTokenResponse, error) {
+
+	refreshToken = strings.TrimSpace(refreshToken)
+
+	if refreshToken == "" {
+		return dto.RefreshTokenResponse{}, ErrInvalidCredentials
+	}
+
+	tokenHash := auth.HashRefreshToken(refreshToken)
+
+	storedToken, err := s.refreshTokenRepo.GetRefreshTokenByHash(
+		ctx,
+		tokenHash,
+	)
+	if err != nil {
+		if errors.Is(err, repository.ErrRefreshTokenNotFound) {
+			return dto.RefreshTokenResponse{}, ErrInvalidCredentials
+		}
+
+		return dto.RefreshTokenResponse{},
+			fmt.Errorf("get refresh token: %w", err)
+	}
+
+	if !storedToken.ExpiresAt.Valid ||
+		time.Now().After(storedToken.ExpiresAt.Time) {
+		return dto.RefreshTokenResponse{}, ErrInvalidCredentials
+	}
+
+	accessToken, err := auth.GenerateToken(
+		storedToken.AccountID,
+		s.jwtSecret,
+	)
+	if err != nil {
+		return dto.RefreshTokenResponse{},
+			fmt.Errorf("generate access token: %w", err)
+	}
+
+	return dto.RefreshTokenResponse{
+		AccessToken: accessToken,
+	}, nil
+}

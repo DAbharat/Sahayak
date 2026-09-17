@@ -11,6 +11,7 @@ import (
 	"github.com/DAbharat/Sahayak/internal/db"
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
 	"github.com/DAbharat/Sahayak/internal/handler"
+	"github.com/DAbharat/Sahayak/internal/middleware"
 	"github.com/DAbharat/Sahayak/internal/repository"
 	"github.com/DAbharat/Sahayak/internal/router"
 	"github.com/DAbharat/Sahayak/internal/service"
@@ -52,6 +53,8 @@ func main() {
 		log.Fatal("JWT_SECRET is not set")
 	}
 
+	authMiddleware := middleware.NewAuthMiddleware(jwtSecret)
+
 	// Services
 	accountService := service.NewAccountService(
 		accountRepo,
@@ -87,6 +90,7 @@ func main() {
 		schemeHandler,
 		schemeRuleHandler,
 		eligibilityHandler,
+		authMiddleware,
 	)
 
 	port := os.Getenv("PORT")

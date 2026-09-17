@@ -8,6 +8,11 @@ import (
 )
 
 func registerSchemeRoutes(r *mux.Router, schemeHandler *handler.SchemeHandler) {
-	r.Handle("/api/schemes", http.HandlerFunc(schemeHandler.ListSchemes)).Methods("GET")
-	r.Handle("/api/schemes/{schemeID}", http.HandlerFunc(schemeHandler.GetSchemeByID)).Methods("GET")
+	r.Handle("/api/schemes",
+		http.HandlerFunc(schemeHandler.ListSchemes),
+	).Methods("GET")
+
+	r.Handle("/api/schemes/{schemeID}",
+		http.HandlerFunc(schemeHandler.GetSchemeByID),
+	).Methods("GET")
 }

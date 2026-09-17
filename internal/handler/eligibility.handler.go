@@ -14,29 +14,20 @@ import (
 )
 
 type EligibilityService interface {
-	CheckEligibility(
-		ctx context.Context,
-		accountID int64,
-		schemeID int64,
-	) (dto.EligibilityResponse, error)
+	CheckEligibility(ctx context.Context, accountID int64, schemeID int64) (dto.EligibilityResponse, error)
 }
 
 type EligibilityHandler struct {
 	eligibilityService EligibilityService
 }
 
-func NewEligibilityHandler(
-	eligibilityService EligibilityService,
-) *EligibilityHandler {
+func NewEligibilityHandler(eligibilityService EligibilityService) *EligibilityHandler {
 	return &EligibilityHandler{
 		eligibilityService: eligibilityService,
 	}
 }
 
-func (h *EligibilityHandler) CheckEligibility(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
+func (h *EligibilityHandler) CheckEligibility(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
 
 	var req dto.EligibilityRequest

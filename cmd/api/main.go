@@ -41,15 +41,32 @@ func main() {
 
 	// Repositories
 	accountRepo := repository.NewAccountsRepository(queries)
+	refreshTokenRepo := repository.NewRefreshTokenRepository(queries)
 	profileRepo := repository.NewProfileRepository(queries)
 	schemeRepo := repository.NewSchemeRepository(queries)
 	schemeRuleRepo := repository.NewSchemeRulesRepository(queries)
 
+	// JWT
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET is not set")
+	}
+
 	// Services
-	accountService := service.NewAccountService(accountRepo)
+	accountService := service.NewAccountService(
+		accountRepo,
+		refreshTokenRepo,
+		jwtSecret,
+	)
+
 	profileService := service.NewProfileService(profileRepo)
+
 	schemeService := service.NewSchemeService(schemeRepo)
-	schemeRuleService := service.NewSchemeRuleService(schemeRuleRepo)
+
+	schemeRuleService := service.NewSchemeRuleService(
+		schemeRuleRepo,
+	)
+
 	eligibilityService := service.NewEligibilityService(
 		profileRepo,
 		schemeRepo,

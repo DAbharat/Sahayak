@@ -15,22 +15,9 @@ import (
 )
 
 type ProfileService interface {
-	CreateProfile(
-		ctx context.Context,
-		accountID int64,
-		req dto.CreateProfileRequest,
-	) (dto.ProfileResponse, error)
-
-	GetProfileByAccountID(
-		ctx context.Context,
-		accountID int64,
-	) (dto.ProfileResponse, error)
-
-	UpdateProfile(
-		ctx context.Context,
-		accountID int64,
-		req dto.CreateProfileRequest,
-	) (dto.ProfileResponse, error)
+	CreateProfile(ctx context.Context, accountID int64, req dto.CreateProfileRequest) (dto.ProfileResponse, error)
+	GetProfileByAccountID(ctx context.Context, accountID int64) (dto.ProfileResponse, error)
+	UpdateProfile(ctx context.Context, accountID int64, req dto.CreateProfileRequest) (dto.ProfileResponse, error)
 }
 
 type ProfileHandler struct {
@@ -44,11 +31,7 @@ func NewProfileHandler(profileService ProfileService) *ProfileHandler {
 }
 
 func parseAccountID(w http.ResponseWriter, r *http.Request) (int64, bool) {
-	accountID, err := strconv.ParseInt(
-		mux.Vars(r)["accountID"],
-		10,
-		64,
-	)
+	accountID, err := strconv.ParseInt(mux.Vars(r)["accountID"], 10, 64)
 	if err != nil {
 		httpx.RespondWithError(
 			w,

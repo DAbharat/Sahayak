@@ -12,37 +12,10 @@ import (
 )
 
 type ProfileRepo interface {
-	CreateProfile(
-		ctx context.Context,
-		accountID int64,
-		state string,
-		occupation string,
-		monthlyIncome int64,
-		age int32,
-		gender sqlc.Gender,
-		childrenCount int32,
-	) (sqlc.Profile, error)
-
-	GetProfileByAccountID(
-		ctx context.Context,
-		accountID int64,
-	) (sqlc.Profile, error)
-
-	GetProfileByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.Profile, error)
-
-	UpdateProfile(
-		ctx context.Context,
-		accountID int64,
-		state string,
-		occupation string,
-		monthlyIncome int64,
-		age int32,
-		gender sqlc.Gender,
-		childrenCount int32,
-	) (sqlc.Profile, error)
+	CreateProfile(ctx context.Context, accountID int64, state string, occupation string, monthlyIncome int64, age int32, gender sqlc.Gender, childrenCount int32) (sqlc.Profile, error)
+	GetProfileByAccountID(ctx context.Context, accountID int64) (sqlc.Profile, error)
+	GetProfileByID(ctx context.Context, id int64) (sqlc.Profile, error)
+	UpdateProfile(ctx context.Context, accountID int64, state string, occupation string, monthlyIncome int64, age int32, gender sqlc.Gender, childrenCount int32) (sqlc.Profile, error)
 }
 
 type ProfileService struct {
@@ -86,11 +59,7 @@ func (s *ProfileService) validateProfile(req dto.CreateProfileRequest) error {
 	return nil
 }
 
-func (s *ProfileService) CreateProfile(
-	ctx context.Context,
-	accountID int64,
-	req dto.CreateProfileRequest,
-) (dto.ProfileResponse, error) {
+func (s *ProfileService) CreateProfile(ctx context.Context, accountID int64, req dto.CreateProfileRequest) (dto.ProfileResponse, error) {
 
 	if accountID <= 0 {
 		return dto.ProfileResponse{}, ErrInvalidAccountID
@@ -117,10 +86,7 @@ func (s *ProfileService) CreateProfile(
 	return mapProfile(profile), nil
 }
 
-func (s *ProfileService) GetProfileByAccountID(
-	ctx context.Context,
-	accountID int64,
-) (dto.ProfileResponse, error) {
+func (s *ProfileService) GetProfileByAccountID(ctx context.Context, accountID int64) (dto.ProfileResponse, error) {
 
 	if accountID <= 0 {
 		return dto.ProfileResponse{}, ErrInvalidAccountID
@@ -138,10 +104,7 @@ func (s *ProfileService) GetProfileByAccountID(
 	return mapProfile(profile), nil
 }
 
-func (s *ProfileService) GetProfileByID(
-	ctx context.Context,
-	id int64,
-) (dto.ProfileResponse, error) {
+func (s *ProfileService) GetProfileByID(ctx context.Context, id int64) (dto.ProfileResponse, error) {
 
 	if id <= 0 {
 		return dto.ProfileResponse{}, ErrInvalidProfileID
@@ -159,11 +122,7 @@ func (s *ProfileService) GetProfileByID(
 	return mapProfile(profile), nil
 }
 
-func (s *ProfileService) UpdateProfile(
-	ctx context.Context,
-	accountID int64,
-	req dto.CreateProfileRequest,
-) (dto.ProfileResponse, error) {
+func (s *ProfileService) UpdateProfile(ctx context.Context, accountID int64, req dto.CreateProfileRequest) (dto.ProfileResponse, error) {
 
 	if accountID <= 0 {
 		return dto.ProfileResponse{}, ErrInvalidAccountID

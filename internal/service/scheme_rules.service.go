@@ -10,28 +10,10 @@ import (
 )
 
 type SchemeRulesRepo interface {
-	CreateSchemeRule(
-		ctx context.Context,
-		schemeID int64,
-		field string,
-		operator string,
-		value []byte,
-	) (sqlc.SchemeRule, error)
-
-	GetSchemeRuleByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.SchemeRule, error)
-
-	GetSchemeRulesBySchemeID(
-		ctx context.Context,
-		schemeID int64,
-	) ([]sqlc.SchemeRule, error)
-
-	DeleteSchemeRule(
-		ctx context.Context,
-		id int64,
-	) (int64, error)
+	CreateSchemeRule(ctx context.Context, schemeID int64, field string, operator string, value []byte) (sqlc.SchemeRule, error)
+	GetSchemeRuleByID(ctx context.Context, id int64) (sqlc.SchemeRule, error)
+	GetSchemeRulesBySchemeID(ctx context.Context, schemeID int64) ([]sqlc.SchemeRule, error)
+	DeleteSchemeRule(ctx context.Context, id int64) (int64, error)
 }
 
 type SchemeRuleService struct {
@@ -44,10 +26,7 @@ func NewSchemeRuleService(ruleRepo SchemeRulesRepo) *SchemeRuleService {
 	}
 }
 
-func (s *SchemeRuleService) GetSchemeRuleByID(
-	ctx context.Context,
-	id int64,
-) (sqlc.SchemeRule, error) {
+func (s *SchemeRuleService) GetSchemeRuleByID(ctx context.Context, id int64) (sqlc.SchemeRule, error) {
 
 	if id <= 0 {
 		return sqlc.SchemeRule{}, ErrInvalidSchemeRuleID
@@ -65,9 +44,7 @@ func (s *SchemeRuleService) GetSchemeRuleByID(
 	return rule, nil
 }
 
-func (s *SchemeRuleService) GetSchemeRulesBySchemeID(
-	ctx context.Context,
-	schemeID int64,
+func (s *SchemeRuleService) GetSchemeRulesBySchemeID(ctx context.Context, schemeID int64,
 ) ([]sqlc.SchemeRule, error) {
 
 	if schemeID <= 0 {

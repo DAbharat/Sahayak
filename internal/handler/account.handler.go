@@ -15,20 +15,9 @@ import (
 )
 
 type AccountService interface {
-	CreateAccount(
-		ctx context.Context,
-		req dto.CreateAccountRequest,
-	) (dto.CreateAccountResponse, error)
-
-	Login(
-		ctx context.Context,
-		req dto.LoginAccountRequest,
-	) (dto.LoginAccountResponse, error)
-
-	GetAccountByID(
-		ctx context.Context,
-		id int64,
-	) (dto.AccountResponse, error)
+	CreateAccount(ctx context.Context, req dto.CreateAccountRequest) (dto.CreateAccountResponse, error)
+	Login(ctx context.Context, req dto.LoginAccountRequest) (dto.LoginAccountResponse, error)
+	GetAccountByID(ctx context.Context, id int64) (dto.AccountResponse, error)
 }
 
 type AccountHandler struct {

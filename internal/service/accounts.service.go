@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/mail"
 	"strings"
+	"time"
 
+	"github.com/DAbharat/Sahayak/internal/auth"
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
 	"github.com/DAbharat/Sahayak/internal/dto"
 	"github.com/DAbharat/Sahayak/internal/repository"
@@ -17,36 +19,33 @@ import (
 const passwordHashCost = bcrypt.DefaultCost
 
 type AccountRepo interface {
-	CreateAccount(
-		ctx context.Context,
-		email string,
-		passwordHash string,
-	) (sqlc.Account, error)
+	CreateAccount(ctx context.Context, email string, passwordHash string) (sqlc.Account, error)
+	GetAccountByEmail(ctx context.Context, email string) (sqlc.Account, error)
+	GetAccountByID(ctx context.Context, id int64) (sqlc.Account, error)
+}
 
-	GetAccountByEmail(
-		ctx context.Context,
-		email string,
-	) (sqlc.Account, error)
-
-	GetAccountByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.Account, error)
+type RefreshTokenRepo interface {
+	CreateRefreshToken(ctx context.Context, accountID int64, tokenHash string, expiresAt time.Time) (sqlc.RefreshToken, error)
+	GetRefreshTokenByHash(ctx context.Context, tokenHash string) (sqlc.RefreshToken, error)
+	DeleteRefreshToken(ctx context.Context, tokenHash string) error
+	DeleteRefreshTokensByAccountID(ctx context.Context, accountID int64) error
 }
 
 type AccountService struct {
-	accountRepo AccountRepo
+	accountRepo      AccountRepo
+	refreshTokenRepo RefreshTokenRepo
+	jwtSecret        string
 }
 
-func NewAccountService(accountRepo AccountRepo) *AccountService {
+func NewAccountService(accountRepo AccountRepo, refreshTokenRepo RefreshTokenRepo, jwtSecret string) *AccountService {
 	return &AccountService{
-		accountRepo: accountRepo,
+		accountRepo:      accountRepo,
+		jwtSecret:        jwtSecret,
+		refreshTokenRepo: refreshTokenRepo,
 	}
 }
 
-func (s *AccountService) validateCreateAccount(
-	req dto.CreateAccountRequest,
-) error {
+func (s *AccountService) validateCreateAccount(req dto.CreateAccountRequest) error {
 
 	email := strings.TrimSpace(req.Email)
 
@@ -61,10 +60,7 @@ func (s *AccountService) validateCreateAccount(
 	return nil
 }
 
-func (s *AccountService) CreateAccount(
-	ctx context.Context,
-	req dto.CreateAccountRequest,
-) (dto.CreateAccountResponse, error) {
+func (s *AccountService) CreateAccount(ctx context.Context, req dto.CreateAccountRequest) (dto.CreateAccountResponse, error) {
 
 	req.Email = strings.TrimSpace(req.Email)
 
@@ -101,10 +97,7 @@ func (s *AccountService) CreateAccount(
 	}, nil
 }
 
-func (s *AccountService) Login(
-	ctx context.Context,
-	req dto.LoginAccountRequest,
-) (dto.LoginAccountResponse, error) {
+func (s *AccountService) Login(ctx context.Context, req dto.LoginAccountRequest) (dto.LoginAccountResponse, error) {
 
 	email := strings.TrimSpace(req.Email)
 
@@ -130,16 +123,37 @@ func (s *AccountService) Login(
 		return dto.LoginAccountResponse{}, ErrInvalidCredentials
 	}
 
+	token, err := auth.GenerateToken(account.ID, s.jwtSecret)
+	if err != nil {
+		return dto.LoginAccountResponse{}, fmt.Errorf("generate jwt: %w", err)
+	}
+
+	refreshToken, err := auth.GenerateRefreshToken()
+	if err != nil {
+		return dto.LoginAccountResponse{}, fmt.Errorf("generate refresh token: %w", err)
+	}
+
+	refreshTokenHash := auth.HashRefreshToken(refreshToken)
+
+	_, err = s.refreshTokenRepo.CreateRefreshToken(
+		ctx,
+		account.ID,
+		refreshTokenHash,
+		time.Now().Add(7*24*time.Hour),
+	)
+	if err != nil {
+		return dto.LoginAccountResponse{}, fmt.Errorf("store refresh token: %w", err)
+	}
+
 	return dto.LoginAccountResponse{
-		ID:    account.ID,
-		Email: account.Email,
+		ID:           account.ID,
+		Email:        account.Email,
+		AccessToken:  token,
+		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (s *AccountService) GetAccountByID(
-	ctx context.Context,
-	id int64,
-) (dto.AccountResponse, error) {
+func (s *AccountService) GetAccountByID(ctx context.Context, id int64) (dto.AccountResponse, error) {
 
 	if id <= 0 {
 		return dto.AccountResponse{}, ErrInvalidAccountID

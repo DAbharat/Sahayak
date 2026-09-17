@@ -13,14 +13,18 @@ import (
 type Querier interface {
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateProfile(ctx context.Context, arg CreateProfileParams) (Profile, error)
+	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
 	CreateScheme(ctx context.Context, arg CreateSchemeParams) (Scheme, error)
 	CreateSchemeRule(ctx context.Context, arg CreateSchemeRuleParams) (SchemeRule, error)
+	DeleteRefreshToken(ctx context.Context, tokenHash string) error
+	DeleteRefreshTokensByAccountID(ctx context.Context, accountID int64) error
 	DeleteScheme(ctx context.Context, id int64) (int64, error)
 	DeleteSchemeRule(ctx context.Context, id int64) (int64, error)
 	GetAccountByEmail(ctx context.Context, email string) (Account, error)
 	GetAccountByID(ctx context.Context, id int64) (Account, error)
 	GetProfileByAccountID(ctx context.Context, accountID int64) (Profile, error)
 	GetProfileByID(ctx context.Context, id int64) (Profile, error)
+	GetRefreshTokenByHash(ctx context.Context, tokenHash string) (RefreshToken, error)
 	GetSchemeByID(ctx context.Context, id int64) (Scheme, error)
 	GetSchemeRuleByID(ctx context.Context, id int64) (SchemeRule, error)
 	GetSchemeRulesBySchemeID(ctx context.Context, schemeID pgtype.Int8) ([]SchemeRule, error)

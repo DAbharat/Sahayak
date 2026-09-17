@@ -73,6 +73,14 @@ type Profile struct {
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 }
 
+type RefreshToken struct {
+	ID        int64              `json:"id"`
+	AccountID int64              `json:"account_id"`
+	TokenHash string             `json:"token_hash"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 type Scheme struct {
 	ID             int64              `json:"id"`
 	Name           string             `json:"name"`

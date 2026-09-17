@@ -15,15 +15,8 @@ import (
 )
 
 type SchemeRuleService interface {
-	GetSchemeRuleByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.SchemeRule, error)
-
-	GetSchemeRulesBySchemeID(
-		ctx context.Context,
-		schemeID int64,
-	) ([]sqlc.SchemeRule, error)
+	GetSchemeRuleByID(ctx context.Context, id int64) (sqlc.SchemeRule, error)
+	GetSchemeRulesBySchemeID(ctx context.Context, schemeID int64) ([]sqlc.SchemeRule, error)
 }
 
 type SchemeRuleHandler struct {

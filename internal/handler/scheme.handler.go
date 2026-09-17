@@ -15,19 +15,9 @@ import (
 )
 
 type SchemeService interface {
-	GetSchemeByID(
-		ctx context.Context,
-		id int64,
-	) (dto.SchemeResponse, error)
-
-	ListSchemes(
-		ctx context.Context,
-	) ([]dto.SchemeResponse, error)
-
-	ListSchemesByState(
-		ctx context.Context,
-		state string,
-	) ([]dto.SchemeResponse, error)
+	GetSchemeByID(ctx context.Context, id int64) (dto.SchemeResponse, error)
+	ListSchemes(ctx context.Context) ([]dto.SchemeResponse, error)
+	ListSchemesByState(ctx context.Context, state string) ([]dto.SchemeResponse, error)
 }
 
 type SchemeHandler struct {

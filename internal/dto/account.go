@@ -18,8 +18,10 @@ type LoginAccountRequest struct {
 }
 
 type LoginAccountResponse struct {
-	ID    int64  `json:"id"`
-	Email string `json:"email"`
+	ID           int64  `json:"id"`
+	Email        string `json:"email"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type AccountResponse struct {

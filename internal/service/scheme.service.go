@@ -13,43 +13,12 @@ import (
 )
 
 type SchemeRepo interface {
-	CreateScheme(
-		ctx context.Context,
-		name string,
-		description string,
-		state string,
-		sourceURL string,
-		lastVerifiedAt pgtype.Timestamptz,
-	) (sqlc.Scheme, error)
-
-	GetSchemeByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.Scheme, error)
-
-	ListSchemes(
-		ctx context.Context,
-	) ([]sqlc.Scheme, error)
-
-	ListSchemesByState(
-		ctx context.Context,
-		state string,
-	) ([]sqlc.Scheme, error)
-
-	UpdateScheme(
-		ctx context.Context,
-		id int64,
-		name string,
-		description string,
-		state string,
-		sourceURL string,
-		lastVerifiedAt pgtype.Timestamptz,
-	) (sqlc.Scheme, error)
-
-	DeleteScheme(
-		ctx context.Context,
-		id int64,
-	) (int64, error)
+	CreateScheme(ctx context.Context, name string, description string, state string, sourceURL string, lastVerifiedAt pgtype.Timestamptz) (sqlc.Scheme, error)
+	GetSchemeByID(ctx context.Context, id int64) (sqlc.Scheme, error)
+	ListSchemes(ctx context.Context) ([]sqlc.Scheme, error)
+	ListSchemesByState(ctx context.Context, state string) ([]sqlc.Scheme, error)
+	UpdateScheme(ctx context.Context, id int64, name string, description string, state string, sourceURL string, lastVerifiedAt pgtype.Timestamptz) (sqlc.Scheme, error)
+	DeleteScheme(ctx context.Context, id int64) (int64, error)
 }
 
 type SchemeService struct {
@@ -62,10 +31,7 @@ func NewSchemeService(schemeRepo SchemeRepo) *SchemeService {
 	}
 }
 
-func (s *SchemeService) GetSchemeByID(
-	ctx context.Context,
-	id int64,
-) (dto.SchemeResponse, error) {
+func (s *SchemeService) GetSchemeByID(ctx context.Context, id int64) (dto.SchemeResponse, error) {
 
 	if id <= 0 {
 		return dto.SchemeResponse{}, ErrInvalidSchemeID
@@ -83,9 +49,7 @@ func (s *SchemeService) GetSchemeByID(
 	return mapScheme(scheme), nil
 }
 
-func (s *SchemeService) ListSchemes(
-	ctx context.Context,
-) ([]dto.SchemeResponse, error) {
+func (s *SchemeService) ListSchemes(ctx context.Context) ([]dto.SchemeResponse, error) {
 
 	schemes, err := s.schemeRepo.ListSchemes(ctx)
 	if err != nil {
@@ -95,10 +59,7 @@ func (s *SchemeService) ListSchemes(
 	return mapSchemes(schemes), nil
 }
 
-func (s *SchemeService) ListSchemesByState(
-	ctx context.Context,
-	state string,
-) ([]dto.SchemeResponse, error) {
+func (s *SchemeService) ListSchemesByState(ctx context.Context, state string) ([]dto.SchemeResponse, error) {
 
 	state = strings.TrimSpace(state)
 

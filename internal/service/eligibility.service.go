@@ -11,24 +11,15 @@ import (
 )
 
 type EligibilityProfileRepo interface {
-	GetProfileByAccountID(
-		ctx context.Context,
-		accountID int64,
-	) (sqlc.Profile, error)
+	GetProfileByAccountID(ctx context.Context, accountID int64) (sqlc.Profile, error)
 }
 
 type EligibilitySchemeRepo interface {
-	GetSchemeByID(
-		ctx context.Context,
-		id int64,
-	) (sqlc.Scheme, error)
+	GetSchemeByID(ctx context.Context, id int64) (sqlc.Scheme, error)
 }
 
 type EligibilityRuleRepo interface {
-	GetSchemeRulesBySchemeID(
-		ctx context.Context,
-		schemeID int64,
-	) ([]sqlc.SchemeRule, error)
+	GetSchemeRulesBySchemeID(ctx context.Context, schemeID int64) ([]sqlc.SchemeRule, error)
 }
 
 type EligibilityService struct {
@@ -37,11 +28,7 @@ type EligibilityService struct {
 	ruleRepo    EligibilityRuleRepo
 }
 
-func NewEligibilityService(
-	profileRepo EligibilityProfileRepo,
-	schemeRepo EligibilitySchemeRepo,
-	ruleRepo EligibilityRuleRepo,
-) *EligibilityService {
+func NewEligibilityService(profileRepo EligibilityProfileRepo, schemeRepo EligibilitySchemeRepo, ruleRepo EligibilityRuleRepo) *EligibilityService {
 	return &EligibilityService{
 		profileRepo: profileRepo,
 		schemeRepo:  schemeRepo,
@@ -77,10 +64,7 @@ func parseRuleValue(value []byte) (eligibilityRuleValue, error) {
 	}
 }
 
-func getProfileField(
-	profile sqlc.Profile,
-	field string,
-) (interface{}, error) {
+func getProfileField(profile sqlc.Profile, field string) (interface{}, error) {
 
 	switch field {
 	case "age":
@@ -106,10 +90,7 @@ func getProfileField(
 	}
 }
 
-func evaluateRule(
-	profile sqlc.Profile,
-	rule sqlc.SchemeRule,
-) (bool, error) {
+func evaluateRule(profile sqlc.Profile, rule sqlc.SchemeRule) (bool, error) {
 
 	fieldValue, err := getProfileField(profile, rule.Field)
 	if err != nil {
@@ -181,11 +162,7 @@ func evaluateRule(
 	}
 }
 
-func (s *EligibilityService) CheckEligibility(
-	ctx context.Context,
-	accountID int64,
-	schemeID int64,
-) (dto.EligibilityResponse, error) {
+func (s *EligibilityService) CheckEligibility(ctx context.Context, accountID int64, schemeID int64) (dto.EligibilityResponse, error) {
 
 	if accountID <= 0 {
 		return dto.EligibilityResponse{}, ErrInvalidAccountID

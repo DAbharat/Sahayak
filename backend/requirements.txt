@@ -1,0 +1,33 @@
+# Core
+fastapi>=0.119.0
+starlette>=0.46.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.12
+
+# Streamlit frontend
+streamlit>=1.38.0
+python-dotenv>=1.0.0
+requests>=2.32.0
+
+# AWS — pin botocore>=1.36.0 to avoid aiobotocore conflict
+boto3>=1.36.0
+botocore>=1.36.0,<1.37
+
+# Pydantic / Config
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# HTTP client (for tests)
+httpx==0.27.2
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+moto[s3,transcribe,polly,textract]==5.0.16
+
+# Observability (stdlib json logging — no external dependency needed)
+# python-json-logger removed in favour of stdlib implementation
+
+# Linting / type checking (dev)
+ruff==0.6.9
+mypy==1.11.2

@@ -11,6 +11,7 @@ import (
 
 const createProfile = `-- name: CreateProfile :one
 INSERT INTO profiles (
+    account_id,
     state,
     occupation,
     monthly_income,
@@ -19,19 +20,28 @@ INSERT INTO profiles (
     children_count
 )
 VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7
 )
 RETURNING
     id,
+    account_id,
     state,
     occupation,
     monthly_income,
     age,
     gender,
-    children_count
+    children_count,
+    created_at
 `
 
 type CreateProfileParams struct {
+	AccountID     int64  `json:"account_id"`
 	State         string `json:"state"`
 	Occupation    string `json:"occupation"`
 	MonthlyIncome int64  `json:"monthly_income"`
@@ -40,18 +50,9 @@ type CreateProfileParams struct {
 	ChildrenCount int32  `json:"children_count"`
 }
 
-type CreateProfileRow struct {
-	ID            int64  `json:"id"`
-	State         string `json:"state"`
-	Occupation    string `json:"occupation"`
-	MonthlyIncome int64  `json:"monthly_income"`
-	Age           int32  `json:"age"`
-	Gender        Gender `json:"gender"`
-	ChildrenCount int32  `json:"children_count"`
-}
-
-func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) (CreateProfileRow, error) {
+func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) (Profile, error) {
 	row := q.db.QueryRow(ctx, createProfile,
+		arg.AccountID,
 		arg.State,
 		arg.Occupation,
 		arg.MonthlyIncome,
@@ -59,15 +60,138 @@ func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) (C
 		arg.Gender,
 		arg.ChildrenCount,
 	)
-	var i CreateProfileRow
+	var i Profile
 	err := row.Scan(
 		&i.ID,
+		&i.AccountID,
 		&i.State,
 		&i.Occupation,
 		&i.MonthlyIncome,
 		&i.Age,
 		&i.Gender,
 		&i.ChildrenCount,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getProfileByAccountID = `-- name: GetProfileByAccountID :one
+SELECT
+    id,
+    account_id,
+    state,
+    occupation,
+    monthly_income,
+    age,
+    gender,
+    children_count,
+    created_at
+FROM profiles
+WHERE account_id = $1
+`
+
+func (q *Queries) GetProfileByAccountID(ctx context.Context, accountID int64) (Profile, error) {
+	row := q.db.QueryRow(ctx, getProfileByAccountID, accountID)
+	var i Profile
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.State,
+		&i.Occupation,
+		&i.MonthlyIncome,
+		&i.Age,
+		&i.Gender,
+		&i.ChildrenCount,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getProfileByID = `-- name: GetProfileByID :one
+SELECT
+    id,
+    account_id,
+    state,
+    occupation,
+    monthly_income,
+    age,
+    gender,
+    children_count,
+    created_at
+FROM profiles
+WHERE id = $1
+`
+
+func (q *Queries) GetProfileByID(ctx context.Context, id int64) (Profile, error) {
+	row := q.db.QueryRow(ctx, getProfileByID, id)
+	var i Profile
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.State,
+		&i.Occupation,
+		&i.MonthlyIncome,
+		&i.Age,
+		&i.Gender,
+		&i.ChildrenCount,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateProfile = `-- name: UpdateProfile :one
+UPDATE profiles
+SET
+    state = $2,
+    occupation = $3,
+    monthly_income = $4,
+    age = $5,
+    gender = $6,
+    children_count = $7
+WHERE account_id = $1
+RETURNING
+    id,
+    account_id,
+    state,
+    occupation,
+    monthly_income,
+    age,
+    gender,
+    children_count,
+    created_at
+`
+
+type UpdateProfileParams struct {
+	AccountID     int64  `json:"account_id"`
+	State         string `json:"state"`
+	Occupation    string `json:"occupation"`
+	MonthlyIncome int64  `json:"monthly_income"`
+	Age           int32  `json:"age"`
+	Gender        Gender `json:"gender"`
+	ChildrenCount int32  `json:"children_count"`
+}
+
+func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (Profile, error) {
+	row := q.db.QueryRow(ctx, updateProfile,
+		arg.AccountID,
+		arg.State,
+		arg.Occupation,
+		arg.MonthlyIncome,
+		arg.Age,
+		arg.Gender,
+		arg.ChildrenCount,
+	)
+	var i Profile
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.State,
+		&i.Occupation,
+		&i.MonthlyIncome,
+		&i.Age,
+		&i.Gender,
+		&i.ChildrenCount,
+		&i.CreatedAt,
 	)
 	return i, err
 }

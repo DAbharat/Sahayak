@@ -56,7 +56,7 @@ def mock_extract_profile(text: str) -> UserProfile:
 
     # Detect Monthly Income
     monthly_income: Optional[float] = None
-    income_match = re.search(r'(?:₹|rs\.?|inr|kamata|income|rupaye|rupees)?\s*(\d{3,6})', text_lower)
+    income_match = re.search(r'(?:₹|rs\.?|inr|kamata|income|rupaye|rupees)?[^\d]{0,10}(\d{3,6})\b', text_lower)
     if income_match:
         val = float(income_match.group(1))
         # sensible range check
@@ -104,7 +104,7 @@ def mock_extract_profile(text: str) -> UserProfile:
 
     # Detect Age
     age: Optional[int] = None
-    age_match = re.search(r'(?:age|umar|saal|years old|varsh)\s*(?:is|ke|h|hai)?\s*(\d{2})', text_lower)
+    age_match = re.search(r'(?:age|umar|saal|years old|varsh)\b[^\d]{0,10}(\d{2})\b', text_lower)
     if age_match:
         age = int(age_match.group(1))
     elif any(w in text_lower for w in ["35", "30", "42", "28"]):

@@ -1,3 +1,9 @@
+# Frontend artifacts
+node_modules/
+build/
+dist/
+coverage/
+
 ```gitignore
 # =========================
 # Go Binaries
@@ -24,8 +30,7 @@ go.work.sum
 # =========================
 # Environment Variables
 # =========================
-.env
-.env.*
+.env*
 !.env.example
 
 # =========================

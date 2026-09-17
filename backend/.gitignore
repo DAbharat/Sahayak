@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+ENV/
+
+# Environment and Secrets
+.env
+.env.local
+.streamlit/secrets.toml
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary uploads and audio
+uploads/
+temp/
+*.wav
+*.mp3
+*.pdf
+
+# IDE
+.vscode/
+.idea/

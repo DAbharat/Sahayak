@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-brand-primary: #3368A0;
+  --color-brand-secondary: #66A3BF;
+  --color-brand-mist: #C8DFDB;
+  --color-brand-canvas: #F2EFE7;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #F2EFE7;
+}
+
+html.dark body {
+  background-color: #0B111E;
+}
+
+/* Subtle civic dot-matrix background pattern for day mode */
+.bg-citizen-pattern {
+  background-image: radial-gradient(#66A3BF 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+}
+
+/* Dark mode subtle grid pattern */
+.dark .bg-citizen-pattern {
+  background-image: radial-gradient(rgba(102, 163, 191, 0.25) 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+}

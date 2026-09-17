@@ -1,0 +1,7 @@
+{
+  "name": "Sahayak",
+  "description": "Simple, citizen-friendly government scheme discovery and grievance assistance with voice and text support.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

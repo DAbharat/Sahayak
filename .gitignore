@@ -1,3 +1,9 @@
+# Frontend artifacts
+node_modules/
+build/
+dist/
+coverage/
+
 ```gitignore
 # =========================
 # Go Binaries
@@ -24,8 +30,7 @@ go.work.sum
 # =========================
 # Environment Variables
 # =========================
-.env
-.env.*
+.env*
 !.env.example
 
 # =========================
@@ -64,3 +69,12 @@ docker-compose.override.yml
 benchmarks/
 numbers.txt
 ```
+
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example

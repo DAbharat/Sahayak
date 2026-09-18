@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
 	"github.com/DAbharat/Sahayak/internal/dto"
@@ -13,7 +14,7 @@ import (
 )
 
 type SchemeRepo interface {
-	CreateScheme(ctx context.Context, name string, description string, state string, sourceURL string, lastVerifiedAt pgtype.Timestamptz) (sqlc.Scheme, error)
+	CreateScheme(ctx context.Context, name string, description string, state string, sourceURL string, lastVerifiedAt time.Time) (sqlc.Scheme, error)
 	GetSchemeByID(ctx context.Context, id int64) (sqlc.Scheme, error)
 	ListSchemes(ctx context.Context) ([]sqlc.Scheme, error)
 	ListSchemesByState(ctx context.Context, state string) ([]sqlc.Scheme, error)
@@ -29,6 +30,44 @@ func NewSchemeService(schemeRepo SchemeRepo) *SchemeService {
 	return &SchemeService{
 		schemeRepo: schemeRepo,
 	}
+}
+
+func (s *SchemeService) CreateScheme(
+	ctx context.Context,
+	req dto.CreateSchemeRequest,
+) (dto.SchemeResponse, error) {
+	if strings.TrimSpace(req.Name) == "" {
+		return dto.SchemeResponse{}, ErrInvalidSchemeName
+	}
+
+	if strings.TrimSpace(req.Description) == "" {
+		return dto.SchemeResponse{}, ErrInvalidSchemeDescription
+	}
+
+	if strings.TrimSpace(req.State) == "" {
+		return dto.SchemeResponse{}, ErrInvalidState
+	}
+
+	scheme, err := s.schemeRepo.CreateScheme(
+		ctx,
+		req.Name,
+		req.Description,
+		req.State,
+		req.SourceURL,
+		req.LastVerifiedAt,
+	)
+	if err != nil {
+		return dto.SchemeResponse{}, fmt.Errorf("create scheme: %w", err)
+	}
+
+	return dto.SchemeResponse{
+		ID:             scheme.ID,
+		Name:           scheme.Name,
+		Description:    scheme.Description,
+		State:          scheme.State,
+		SourceURL:      scheme.SourceUrl,
+		LastVerifiedAt: scheme.LastVerifiedAt.Time,
+	}, nil
 }
 
 func (s *SchemeService) GetSchemeByID(ctx context.Context, id int64) (dto.SchemeResponse, error) {

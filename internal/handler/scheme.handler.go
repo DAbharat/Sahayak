@@ -15,6 +15,7 @@ import (
 )
 
 type SchemeService interface {
+	CreateScheme(ctx context.Context, req dto.CreateSchemeRequest) (dto.SchemeResponse, error)
 	GetSchemeByID(ctx context.Context, id int64) (dto.SchemeResponse, error)
 	ListSchemes(ctx context.Context) ([]dto.SchemeResponse, error)
 	ListSchemesByState(ctx context.Context, state string) ([]dto.SchemeResponse, error)
@@ -28,6 +29,45 @@ func NewSchemeHandler(schemeService SchemeService) *SchemeHandler {
 	return &SchemeHandler{
 		schemeService: schemeService,
 	}
+}
+
+func (h *SchemeHandler) CreateScheme(w http.ResponseWriter, r *http.Request) {
+	var req dto.CreateSchemeRequest
+
+	if err := decodeJSONBody(w, r, &req); err != nil {
+		return
+	}
+
+	scheme, err := h.schemeService.CreateScheme(
+		r.Context(),
+		req,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, service.ErrInvalidSchemeName),
+			errors.Is(err, service.ErrInvalidSchemeDescription),
+			errors.Is(err, service.ErrInvalidState):
+			httpx.RespondWithError(
+				w,
+				http.StatusBadRequest,
+				err.Error(),
+			)
+
+		default:
+			httpx.RespondWithError(
+				w,
+				http.StatusInternalServerError,
+				"failed to create scheme",
+			)
+		}
+		return
+	}
+
+	httpx.RespondWithJSON(
+		w,
+		http.StatusCreated,
+		scheme,
+	)
 }
 
 func (h *SchemeHandler) GetSchemeByID(w http.ResponseWriter, r *http.Request) {

@@ -56,25 +56,12 @@ func main() {
 	authMiddleware := middleware.NewAuthMiddleware(jwtSecret)
 
 	// Services
-	accountService := service.NewAccountService(
-		accountRepo,
-		refreshTokenRepo,
-		jwtSecret,
-	)
-
+	accountService := service.NewAccountService(accountRepo, refreshTokenRepo, jwtSecret)
 	profileService := service.NewProfileService(profileRepo)
-
 	schemeService := service.NewSchemeService(schemeRepo)
-
-	schemeRuleService := service.NewSchemeRuleService(
-		schemeRuleRepo,
-	)
-
-	eligibilityService := service.NewEligibilityService(
-		profileRepo,
-		schemeRepo,
-		schemeRuleRepo,
-	)
+	schemeRuleService := service.NewSchemeRuleService(schemeRuleRepo)
+	eligibilityService := service.NewEligibilityService(profileRepo, schemeRepo, schemeRuleRepo)
+	grievanceService := service.NewGrievanceService(profileRepo, schemeRepo)
 
 	// Handlers
 	accountHandler := handler.NewAccountHandler(accountService)
@@ -82,6 +69,7 @@ func main() {
 	schemeHandler := handler.NewSchemeHandler(schemeService)
 	schemeRuleHandler := handler.NewSchemeRuleHandler(schemeRuleService)
 	eligibilityHandler := handler.NewEligibilityHandler(eligibilityService)
+	grievanceHandler := handler.NewGrienvanceHandler(grievanceService)
 
 	// Router
 	r := router.New(
@@ -90,6 +78,7 @@ func main() {
 		schemeHandler,
 		schemeRuleHandler,
 		eligibilityHandler,
+		grievanceHandler,
 		authMiddleware,
 	)
 

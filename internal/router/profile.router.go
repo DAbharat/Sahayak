@@ -9,7 +9,7 @@ import (
 )
 
 func registerProfileRoutes(r *mux.Router, profileHandler *handler.ProfileHandler, authMiddleware *middleware.AuthMiddleware) {
-	r.Handle("/api/accounts/{accountID}/profile",
+	r.Handle("/api/accounts/{accountID}/profile/create",
 		authMiddleware.Authenticate(http.HandlerFunc(profileHandler.CreateProfile)),
 	).Methods("POST")
 
@@ -17,7 +17,7 @@ func registerProfileRoutes(r *mux.Router, profileHandler *handler.ProfileHandler
 		authMiddleware.Authenticate(http.HandlerFunc(profileHandler.GetProfile)),
 	).Methods("GET")
 
-	r.Handle("/api/accounts/{accountID}/profile",
+	r.Handle("/api/accounts/{accountID}/profile/update",
 		authMiddleware.Authenticate(http.HandlerFunc(profileHandler.UpdateProfile)),
 	).Methods("PUT")
 }

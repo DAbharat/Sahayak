@@ -22,10 +22,15 @@ var (
 	ErrInvalidProfileID     = errors.New("invalid profile id")
 
 	// Scheme
-	ErrSchemeNotFound  = errors.New("scheme not found")
-	ErrInvalidSchemeID = errors.New("invalid scheme id")
+	ErrSchemeNotFound           = errors.New("scheme not found")
+	ErrInvalidSchemeID          = errors.New("invalid scheme id")
+	ErrInvalidSchemeName        = errors.New("scheme name is required")
+	ErrInvalidSchemeDescription = errors.New("scheme description is required")
 
 	// Scheme Rule
 	ErrSchemeRuleNotFound  = errors.New("scheme rule not found")
 	ErrInvalidSchemeRuleID = errors.New("invalid scheme rule id")
+
+	// Grievance
+	ErrInvalidUserText = errors.New("user text is required")
 )

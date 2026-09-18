@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
 	"github.com/jackc/pgx/v5"
@@ -26,15 +27,18 @@ func (r *SchemeRepository) CreateScheme(
 	description string,
 	state string,
 	sourceURL string,
-	lastVerifiedAt pgtype.Timestamptz,
+	lastVerifiedAt time.Time,
 ) (sqlc.Scheme, error) {
 
 	params := sqlc.CreateSchemeParams{
-		Name:           name,
-		Description:    description,
-		State:          state,
-		SourceUrl:      sourceURL,
-		LastVerifiedAt: lastVerifiedAt,
+		Name:        name,
+		Description: description,
+		State:       state,
+		SourceUrl:   sourceURL,
+		LastVerifiedAt: pgtype.Timestamptz{
+			Time:  lastVerifiedAt,
+			Valid: true,
+		},
 	}
 
 	scheme, err := r.queries.CreateScheme(ctx, params)

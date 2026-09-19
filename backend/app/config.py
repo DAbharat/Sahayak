@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     aws_profile: str | None = None
 
     # ── Amazon Bedrock ────────────────────────────────────────────────────
-    bedrock_model_id: str = "anthropic.claude-3-haiku-20240307-v1:0"
+    bedrock_model_id: str = "google.gemma-3-4b-it-v1:0"
     bedrock_max_tokens: int = 1024
     bedrock_extraction_temperature: float = 0.1
     bedrock_generation_temperature: float = 0.3

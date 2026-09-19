@@ -24,8 +24,7 @@ public class IngestionRun {
     @Column(nullable = false)
     private IngestionState state;
 
-    @Lob
-    @Column(name = "errors")
+    @Column(name = "errors", columnDefinition = "TEXT")
     private String errors;
 
     @Column(name = "created_at", nullable = false, updatable = false)

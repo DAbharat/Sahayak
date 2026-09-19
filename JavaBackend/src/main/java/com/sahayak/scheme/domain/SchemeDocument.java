@@ -22,8 +22,7 @@ public class SchemeDocument {
     @Column(nullable = false)
     private String title;
 
-    @Lob
-    @Column(name = "raw_text", nullable = false)
+    @Column(name = "raw_text", nullable = false, columnDefinition = "TEXT")
     private String rawText;
 
     @Column(nullable = false)

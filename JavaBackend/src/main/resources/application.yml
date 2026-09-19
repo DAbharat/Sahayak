@@ -1,19 +1,34 @@
 spring:
+  application:
+    name: scheme-ingestion-service
   datasource:
-    url: jdbc:h2:mem:sahayak;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-restless-poetry-b4lh4k3z-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channelBinding=require}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_ilZCLr8NjD9P}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 600000
+      keepalive-time: 30000
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
     open-in-view: false
-  h2:
-    console:
-      enabled: true
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
+app:
+  seed-demo-data: ${APP_SEED_DEMO_DATA:true}
+server:
+  port: 9090

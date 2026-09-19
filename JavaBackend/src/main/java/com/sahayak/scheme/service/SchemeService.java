@@ -6,6 +6,7 @@ import com.sahayak.scheme.dto.EditRuleRequest;
 import com.sahayak.scheme.dto.ReviewActionRequest;
 import com.sahayak.scheme.exception.BadRequestException;
 import com.sahayak.scheme.exception.NotFoundException;
+import com.sahayak.scheme.persistence.ReviewAuditRepository;
 import com.sahayak.scheme.persistence.SchemeRepository;
 import com.sahayak.scheme.persistence.SchemeRuleRepository;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,16 @@ public class SchemeService {
     private final SchemeRepository schemeRepository;
     private final SchemeRuleRepository schemeRuleRepository;
     private final AuditService auditService;
+    private final ReviewAuditRepository reviewAuditRepository;
 
     public SchemeService(SchemeRepository schemeRepository,
                          SchemeRuleRepository schemeRuleRepository,
-                         AuditService auditService) {
+                         AuditService auditService,
+                         ReviewAuditRepository reviewAuditRepository) {
         this.schemeRepository = schemeRepository;
         this.schemeRuleRepository = schemeRuleRepository;
         this.auditService = auditService;
+        this.reviewAuditRepository = reviewAuditRepository;
     }
 
     @Transactional
@@ -82,7 +86,7 @@ public class SchemeService {
     public Scheme approveScheme(Long schemeId, ReviewActionRequest request) {
         Scheme scheme = getScheme(schemeId);
         List<SchemeRule> rules = schemeRuleRepository.findBySchemeId(schemeId);
-        boolean hasPendingUnresolved = rules.stream().anyMatch(rule -> !rule.isResolved());
+        boolean hasPendingUnresolved = rules.stream().anyMatch(rule -> !rule.isResolved() && rule.getReviewStatus() != ReviewStatus.REJECTED);
         if (hasPendingUnresolved) {
             throw new BadRequestException("Cannot publish scheme with unresolved eligibility clauses");
         }
@@ -119,13 +123,34 @@ public class SchemeService {
         rule.setValueType(request.getValueType());
         rule.setRawTextSpan(request.getRawTextSpan().trim());
         rule.setReviewStatus(request.getReviewStatus());
-        rule.setResolved(request.getOperator() != RuleOperator.UNKNOWN);
+        if (request.getOperator() != RuleOperator.UNKNOWN) {
+            rule.setResolved(true);
+            rule.setConfidence(java.math.BigDecimal.ONE);
+        } else {
+            rule.setResolved(false);
+        }
 
         validateRule(rule);
 
         SchemeRule saved = schemeRuleRepository.save(rule);
         auditService.record(scheme, saved, AuditAction.RULE_EDITED, request.getActor(), "Rule manually edited during review");
         return saved;
+    }
+
+    @Transactional
+    public void deleteRule(Long schemeId, Long ruleId, String actor) {
+        Scheme scheme = getScheme(schemeId);
+        SchemeRule rule = schemeRuleRepository.findById(ruleId)
+                .orElseThrow(() -> new NotFoundException("Rule not found: " + ruleId));
+        if (!rule.getScheme().getId().equals(schemeId)) {
+            throw new BadRequestException("Rule does not belong to scheme");
+        }
+
+        // Remove FK-constrained audit records before deleting the rule
+        reviewAuditRepository.deleteAll(reviewAuditRepository.findByRuleId(ruleId));
+        String deletedFieldName = rule.getFieldName();
+        schemeRuleRepository.delete(rule);
+        auditService.record(scheme, null, AuditAction.RULE_DELETED, actor, "Rule deleted: " + deletedFieldName);
     }
 
     public void validateSource(String source, String sourceUrl, SourceType sourceType) {

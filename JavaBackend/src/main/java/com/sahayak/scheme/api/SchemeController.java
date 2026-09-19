@@ -61,6 +61,14 @@ public class SchemeController {
         return schemeMapper.toRuleResponse(schemeService.editRule(schemeId, ruleId, request));
     }
 
+    @DeleteMapping("/{schemeId}/rules/{ruleId}")
+    public ResponseEntity<Void> deleteRule(@PathVariable Long schemeId,
+                                           @PathVariable Long ruleId,
+                                           @RequestHeader(value = "X-Actor", defaultValue = "system") String actor) {
+        schemeService.deleteRule(schemeId, ruleId, actor);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{schemeId}/review/approve")
     public SchemeResponse approveScheme(@PathVariable Long schemeId, @RequestBody @Valid ReviewActionRequest request) {
         return schemeMapper.toSchemeResponse(schemeService.approveScheme(schemeId, request));

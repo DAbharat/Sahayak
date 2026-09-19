@@ -1,6 +1,7 @@
 package com.sahayak.scheme.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -25,6 +26,12 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String msg = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        return error(HttpStatus.CONFLICT, "Database constraint violation: " + msg);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         StringBuilder sb = new StringBuilder();
@@ -35,6 +42,11 @@ public class GlobalExceptionHandler {
             sb.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage());
         }
         return error(HttpStatus.BAD_REQUEST, sb.toString());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {

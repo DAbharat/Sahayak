@@ -230,7 +230,7 @@ with st.sidebar:
     st.markdown("### ☁️ AWS Service Architecture")
     st.markdown(
         f"""
-        - **Bedrock LLM:** `{settings.bedrock_model_id.split('.')[1] if '.' in settings.bedrock_model_id else 'Claude 3 Haiku'}`
+        - **Bedrock LLM:** `{settings.bedrock_model_id.split('.')[1] if '.' in settings.bedrock_model_id else 'Gemma 3 4B'}`
         - **Polly Voice:** `{settings.polly_voice_id}` (Hindi Standard)
         - **Transcribe:** `hi-IN` Hindi Audio Pipeline
         - **Textract:** OCR & Key-Value Extraction

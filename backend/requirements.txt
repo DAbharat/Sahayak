@@ -4,6 +4,9 @@ starlette>=0.46.0
 uvicorn[standard]==0.30.6
 python-multipart==0.0.12
 
+# Speech-to-Text
+faster-whisper>=1.0.0
+
 # Streamlit frontend
 streamlit>=1.38.0
 python-dotenv>=1.0.0

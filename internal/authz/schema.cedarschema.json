@@ -1,0 +1,43 @@
+{
+    "": {
+        "entityTypes": {
+            "User": {
+                "memberOfTypes": [],
+                "shape": {
+                    "type": "Record",
+                    "attributes": {}
+                }
+            },
+            "Profile": {
+                "memberOfTypes": [],
+                "shape": {
+                    "type": "Record",
+                    "attributes": {
+                        "owner": {
+                            "type": "Entity",
+                            "name": "User",
+                            "required": true
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "ReadProfile": {
+                "memberOfTypes": [],
+                "appliesTo": {
+                    "principalTypes": [
+                        "User"
+                    ],
+                    "resourceTypes": [
+                        "Profile"
+                    ],
+                    "context": {
+                        "type": "Record",
+                        "attributes": {}
+                    }
+                }
+            }
+        }
+    }
+}

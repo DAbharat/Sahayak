@@ -5,11 +5,13 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/DAbharat/Sahayak/internal/dto"
 	"github.com/DAbharat/Sahayak/internal/httpx"
 	"github.com/DAbharat/Sahayak/internal/middleware"
 	"github.com/DAbharat/Sahayak/internal/service"
+	"github.com/gorilla/mux"
 )
 
 type ProfileService interface {
@@ -18,13 +20,20 @@ type ProfileService interface {
 	UpdateProfile(ctx context.Context, accountID int64, req dto.CreateProfileRequest) (dto.ProfileResponse, error)
 }
 
-type ProfileHandler struct {
-	profileService ProfileService
+type Authorizer interface {
+	CanReadProfile(userID, accountID int64) (bool, error)
+	CanUpdateProfile(userID, accountID int64) (bool, error)
 }
 
-func NewProfileHandler(profileService ProfileService) *ProfileHandler {
+type ProfileHandler struct {
+	profileService ProfileService
+	authorizer     Authorizer
+}
+
+func NewProfileHandler(profileService ProfileService, authorizer Authorizer) *ProfileHandler {
 	return &ProfileHandler{
 		profileService: profileService,
+		authorizer:     authorizer,
 	}
 }
 
@@ -90,8 +99,28 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-	accountID, ok := getAuthenticatedAccountID(w, r)
+	userID, ok := getAuthenticatedAccountID(w, r)
 	if !ok {
+		return
+	}
+
+	vars := mux.Vars(r)
+
+	accountID, err := strconv.ParseInt(vars["accountID"], 10, 64)
+	if err != nil || accountID <= 0 {
+		httpx.RespondWithError(w, http.StatusBadRequest, "invalid account id")
+		return
+	}
+
+	allowed, err := h.authorizer.CanReadProfile(userID, accountID)
+	if err != nil {
+		log.Printf("profile authorization failed: %v", err)
+		httpx.RespondWithError(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	if !allowed {
+		httpx.RespondWithError(w, http.StatusForbidden, "forbidden")
 		return
 	}
 
@@ -122,8 +151,28 @@ func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	accountID, ok := getAuthenticatedAccountID(w, r)
+	userID, ok := getAuthenticatedAccountID(w, r)
 	if !ok {
+		return
+	}
+
+	vars := mux.Vars(r)
+
+	accountID, err := strconv.ParseInt(vars["accountID"], 10, 64)
+	if err != nil || accountID <= 0 {
+		httpx.RespondWithError(w, http.StatusBadRequest, "invalid account id")
+		return
+	}
+
+	allowed, err := h.authorizer.CanUpdateProfile(userID, accountID)
+	if err != nil {
+		log.Printf("profile update authorization failed: %v", err)
+		httpx.RespondWithError(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	if !allowed {
+		httpx.RespondWithError(w, http.StatusForbidden, "forbidden")
 		return
 	}
 

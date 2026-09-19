@@ -1,0 +1,8 @@
+CREATE TABLE schemes (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    state TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    last_verified_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

@@ -1,0 +1,24 @@
+# Codex Implementation Checklist
+
+- [ ] Inspect repo
+- [ ] Identify frontend/backend
+- [ ] Add AI backend architecture
+- [ ] Bedrock client
+- [ ] Profile extraction
+- [ ] Pydantic validation
+- [ ] Rules engine
+- [ ] Scheme source metadata
+- [ ] Simple explanations
+- [ ] Application draft
+- [ ] Grievance draft
+- [ ] Transcribe
+- [ ] Polly
+- [ ] Textract basic path
+- [ ] Frontend integration
+- [ ] Error handling
+- [ ] Tests with mocked AWS
+- [ ] Documentation
+- [ ] .env.example
+- [ ] Run tests
+- [ ] Run frontend build
+- [ ] Final smoke test

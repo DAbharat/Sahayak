@@ -89,7 +89,7 @@ cp .env.example .env
 Key settings in `.env`:
 ```
 AWS_REGION=us-east-1
-BEDROCK_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
+BEDROCK_MODEL_ID=google.gemma-3-4b-it-v1:0
 POLLY_VOICE_ID=Aditi
 TRANSCRIBE_S3_BUCKET=your-bucket-name
 TEXTRACT_S3_BUCKET=your-bucket-name

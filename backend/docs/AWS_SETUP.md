@@ -27,13 +27,12 @@ aws sts get-caller-identity
 
 1. Go to AWS Console → **Amazon Bedrock** → **Model access**
 2. Click **Manage model access**
-3. Enable: **Anthropic Claude 3 Haiku** (recommended for extraction)
-   - Or: Anthropic Claude 3 Sonnet (higher quality, more expensive)
+3. Enable: **Google Gemma 3 4B** for your region
 4. Wait for access to be granted (usually instant to a few hours)
 
 Verify:
 ```bash
-aws bedrock list-foundation-models --region us-east-1 --query "modelSummaries[?modelId=='anthropic.claude-3-haiku-20240307-v1:0']"
+aws bedrock list-foundation-models --region us-east-1 --query "modelSummaries[?modelId=='google.gemma-3-4b-it-v1:0']"
 ```
 
 ## Step 3: Create S3 Buckets
@@ -141,7 +140,7 @@ cp .env.example .env
 Edit `.env`:
 ```
 AWS_REGION=us-east-1
-BEDROCK_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
+BEDROCK_MODEL_ID=google.gemma-3-4b-it-v1:0
 AWS_PROFILE=govscheme-dev
 POLLY_VOICE_ID=Aditi
 TRANSCRIBE_S3_BUCKET=govscheme-navigator-audio
@@ -160,8 +159,8 @@ export AWS_REGION=us-east-1
 ### Bedrock:
 ```bash
 aws bedrock-runtime invoke-model \
-  --model-id anthropic.claude-3-haiku-20240307-v1:0 \
-  --body '{"anthropic_version":"bedrock-2023-05-31","max_tokens":100,"messages":[{"role":"user","content":"Hello"}]}' \
+  --model-id google.gemma-3-4b-it-v1:0 \
+  --body '{"prompt":"Hello","max_tokens":100}' \
   --cli-binary-format raw-in-base64-out \
   output.json
 ```

@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/DAbharat/Sahayak/internal/authz"
 	"github.com/DAbharat/Sahayak/internal/db"
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
 	"github.com/DAbharat/Sahayak/internal/handler"
@@ -64,8 +65,14 @@ func main() {
 	grievanceService := service.NewGrievanceService(profileRepo, schemeRepo)
 
 	// Handlers
+
+	authorizer, err := authz.NewAuthorizer()
+	if err != nil {
+		log.Fatalf("failed to initialize authorizer: %v", err)
+	}
+
 	accountHandler := handler.NewAccountHandler(accountService)
-	profileHandler := handler.NewProfileHandler(profileService)
+	profileHandler := handler.NewProfileHandler(profileService, authorizer)
 	schemeHandler := handler.NewSchemeHandler(schemeService)
 	schemeRuleHandler := handler.NewSchemeRuleHandler(schemeRuleService)
 	eligibilityHandler := handler.NewEligibilityHandler(eligibilityService)

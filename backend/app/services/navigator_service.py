@@ -195,9 +195,20 @@ class NavigatorService:
         if mock_mode:
             return mock_transcribe_audio(file_bytes, filename)
 
-        from app.aws.transcribe_service import get_transcribe_service
-        service = get_transcribe_service()
-        return service.transcribe(file_bytes, filename)
+        import uuid
+        from app.services.whisper_service import get_whisper_service
+        service = get_whisper_service()
+        transcript, job_name, confidence = service.transcribe_audio(
+            audio_bytes=file_bytes,
+            filename=filename,
+        )
+        return TranscribeResponse(
+            transcript=transcript,
+            language_code="hi-IN",
+            job_name=job_name,
+            confidence=confidence,
+            correlation_id=str(uuid.uuid4()),
+        )
 
     def synthesize_speech(
         self,

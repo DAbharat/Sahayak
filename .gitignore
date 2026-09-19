@@ -1,0 +1,20 @@
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Build artifacts
+**/target/
+*.class
+
+# Environment & credentials
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

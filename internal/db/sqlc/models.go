@@ -14,9 +14,10 @@ import (
 type Gender string
 
 const (
-	GenderMALE   Gender = "MALE"
-	GenderFEMALE Gender = "FEMALE"
-	GenderOTHER  Gender = "OTHER"
+	GenderMale         Gender = "male"
+	GenderFemale       Gender = "female"
+	GenderOther        Gender = "other"
+	GenderNotSpecified Gender = "not_specified"
 )
 
 func (e *Gender) Scan(src interface{}) error {
@@ -62,15 +63,24 @@ type Account struct {
 }
 
 type Profile struct {
-	ID            int64              `json:"id"`
-	AccountID     int64              `json:"account_id"`
-	State         string             `json:"state"`
-	Occupation    string             `json:"occupation"`
-	MonthlyIncome int64              `json:"monthly_income"`
-	Age           int32              `json:"age"`
-	Gender        Gender             `json:"gender"`
-	ChildrenCount int32              `json:"children_count"`
-	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	ID                  int64              `json:"id"`
+	AccountID           int64              `json:"account_id"`
+	State               pgtype.Text        `json:"state"`
+	Occupation          string             `json:"occupation"`
+	MonthlyIncome       pgtype.Int8        `json:"monthly_income"`
+	Age                 pgtype.Int4        `json:"age"`
+	Gender              NullGender         `json:"gender"`
+	ChildrenCount       pgtype.Int4        `json:"children_count"`
+	CreatedAt           pgtype.Timestamptz `json:"created_at"`
+	District            pgtype.Text        `json:"district"`
+	IncomeCurrency      string             `json:"income_currency"`
+	FamilySize          pgtype.Int4        `json:"family_size"`
+	ChildrenSchoolGoing pgtype.Bool        `json:"children_school_going"`
+	IsRegisteredWorker  pgtype.Bool        `json:"is_registered_worker"`
+	CasteCategory       pgtype.Text        `json:"caste_category"`
+	HasBankAccount      pgtype.Bool        `json:"has_bank_account"`
+	DocumentsAvailable  []string           `json:"documents_available"`
+	Language            string             `json:"language"`
 }
 
 type RefreshToken struct {

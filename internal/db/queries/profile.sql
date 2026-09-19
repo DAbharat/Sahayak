@@ -2,59 +2,36 @@
 INSERT INTO profiles (
     account_id,
     state,
+    district,
     occupation,
     monthly_income,
+    income_currency,
+    family_size,
+    children_count,
+    children_school_going,
     age,
     gender,
-    children_count
+    is_registered_worker,
+    caste_category,
+    has_bank_account,
+    documents_available,
+    language
 )
 VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7
+    $1, $2, $3, $4, $5, $6, $7, $8,
+    $9, $10, $11, $12, $13, $14, $15, $16
 )
-RETURNING
-    id,
-    account_id,
-    state,
-    occupation,
-    monthly_income,
-    age,
-    gender,
-    children_count,
-    created_at;
+RETURNING *;
 
 
 -- name: GetProfileByAccountID :one
-SELECT
-    id,
-    account_id,
-    state,
-    occupation,
-    monthly_income,
-    age,
-    gender,
-    children_count,
-    created_at
+SELECT *
 FROM profiles
 WHERE account_id = $1;
 
 
 -- name: GetProfileByID :one
-SELECT
-    id,
-    account_id,
-    state,
-    occupation,
-    monthly_income,
-    age,
-    gender,
-    children_count,
-    created_at
+SELECT *
 FROM profiles
 WHERE id = $1;
 
@@ -63,20 +40,19 @@ WHERE id = $1;
 UPDATE profiles
 SET
     state = $2,
-    occupation = $3,
-    monthly_income = $4,
-    age = $5,
-    gender = $6,
-    children_count = $7
+    district = $3,
+    occupation = $4,
+    monthly_income = $5,
+    income_currency = $6,
+    family_size = $7,
+    children_count = $8,
+    children_school_going = $9,
+    age = $10,
+    gender = $11,
+    is_registered_worker = $12,
+    caste_category = $13,
+    has_bank_account = $14,
+    documents_available = $15,
+    language = $16
 WHERE account_id = $1
-RETURNING
-    id,
-    account_id,
-    state,
-    occupation,
-    monthly_income,
-    age,
-    gender,
-    children_count,
-    created_at;
-
+RETURNING *;

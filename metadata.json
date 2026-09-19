@@ -1,7 +1,6 @@
 {
-  "name": "Sahayak",
-  "description": "Simple, citizen-friendly government scheme discovery and grievance assistance with voice and text support.",
+  "name": "Sahayak - Citizen Schemes & Grievance Portal",
+  "description": "Citizen welfare schemes discovery, bilingual voice-assisted eligibility assessment, and automated grievance drafting portal.",
   "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
-

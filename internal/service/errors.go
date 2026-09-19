@@ -20,6 +20,7 @@ var (
 	ErrInvalidChildrenCount = errors.New("invalid children count")
 	ErrProfileNotFound      = errors.New("profile not found")
 	ErrInvalidProfileID     = errors.New("invalid profile id")
+	ErrInvalidFamilySize    = errors.New("invalid family size")
 
 	// Scheme
 	ErrSchemeNotFound           = errors.New("scheme not found")

@@ -83,7 +83,10 @@ func getProfileField(profile sqlc.Profile, field string) (interface{}, error) {
 		return profile.Occupation, nil
 
 	case "gender":
-		return string(profile.Gender), nil
+		if !profile.Gender.Valid {
+			return nil, nil
+		}
+		return string(profile.Gender.Gender), nil
 
 	default:
 		return nil, fmt.Errorf("unsupported eligibility field: %s", field)

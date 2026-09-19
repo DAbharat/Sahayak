@@ -8,11 +8,12 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from app.aws.polly_service import PollyService, get_polly_service
-from app.aws.transcribe_service import TranscribeService, get_transcribe_service
+from app.services.whisper_service import WhisperService, get_whisper_service
 from app.config import get_settings
 from app.core.errors import FileTooLargeError
 from app.core.logging import get_logger, make_correlation_id
 from app.schemas.voice import SynthesizeRequest, SynthesizeResponse, TranscribeResponse
+from starlette.concurrency import run_in_threadpool
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/voice", tags=["voice"])
@@ -20,24 +21,23 @@ router = APIRouter(prefix="/api/voice", tags=["voice"])
 AUDIO_CONTENT_TYPES = {
     "audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav",
     "audio/flac", "audio/ogg", "audio/webm", "audio/mp4",
-    "video/mp4", "audio/amr",
+    "video/mp4", "audio/amr", "audio/m4a", "audio/x-m4a",
 }
 
 
 @router.post(
     "/transcribe",
     response_model=TranscribeResponse,
-    summary="Convert audio to text (Amazon Transcribe)",
+    summary="Convert audio to text (faster-whisper)",
     description=(
-        "Upload an audio file (WAV, MP3, FLAC, OGG, WebM, MP4) and receive the transcribed text. "
-        "Optimized for Hindi (hi-IN) but supports other Transcribe languages. "
-        "AWS credentials and a configured S3 bucket are required."
+        "Upload an audio file (WAV, MP3, FLAC, OGG, WebM, MP4, M4A) and receive the transcribed text. "
+        "Powered by faster-whisper. Supports Hindi (hi-IN) and multilingual speech recognition."
     ),
 )
 async def transcribe_audio(
     file: UploadFile = File(..., description="Audio file to transcribe"),
-    language_code: str = Form("hi-IN", description="AWS language code (hi-IN, en-IN, etc.)"),
-    service: TranscribeService = Depends(get_transcribe_service),
+    language_code: str = Form("hi-IN", description="Language code (hi-IN, en-IN, etc.)"),
+    service: WhisperService = Depends(get_whisper_service),
 ) -> TranscribeResponse:
     correlation_id = make_correlation_id()
     settings = get_settings()
@@ -57,13 +57,17 @@ async def transcribe_audio(
             "content_type": content_type,
             "size_bytes": len(audio_bytes),
             "language_code": language_code,
+            "audio_filename": file.filename,
         },
     )
 
-    transcript, job_name, confidence = service.transcribe_audio(
+    # Run CPU/GPU intensive Whisper inference in a threadpool so event loop is not blocked
+    transcript, job_name, confidence = await run_in_threadpool(
+        service.transcribe_audio,
         audio_bytes=audio_bytes,
         content_type=content_type,
         language_code=language_code,
+        filename=file.filename,
         correlation_id=correlation_id,
     )
 

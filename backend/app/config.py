@@ -29,9 +29,16 @@ class Settings(BaseSettings):
     bedrock_generation_temperature: float = 0.3
     bedrock_max_retries: int = 3
 
-    # ── Amazon Transcribe ─────────────────────────────────────────────────
+    # ── Amazon Transcribe (Legacy / Fallback) ─────────────────────────────
     transcribe_s3_bucket: str = ""
     transcribe_timeout_seconds: int = 120
+
+    # ── Speech-to-Text (faster-whisper) ───────────────────────────────────
+    whisper_model_size: str = "small"
+    whisper_device: str = "cpu"
+    whisper_compute_type: str = "int8"
+    whisper_beam_size: int = 5
+    whisper_download_root: str | None = None
 
     # ── Amazon Polly ──────────────────────────────────────────────────────
     polly_voice_id: str = "Aditi"

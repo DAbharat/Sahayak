@@ -21,6 +21,7 @@ import { SchemeCard } from '../components/SchemeCard.tsx';
 import { PmModiShowcase, AshokaEmblem, AmritMahotsavLogo } from '../components/Emblems.tsx';
 import { Scheme } from '../types.ts';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import HomepageImg from '../public/assets/Homepageimg.png';
 
 interface HomePageProps {
   onNavigate: (route: string, params?: any) => void;
@@ -66,7 +67,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="lg:col-span-5 flex flex-col h-full min-w-0">
               <div className="relative rounded-2xl overflow-hidden shadow-lg border-2 border-orange-300 group w-full h-full min-h-[260px] sm:min-h-[340px] flex flex-col justify-end bg-slate-900">
                 <img
-                  src="https://images.unsplash.com/photo-1609137144822-49826d52579b?auto=format&fit=crop&w=900&q=80"
+                  src={HomepageImg}
                   alt="Smiling Indian citizen family benefiting from government welfare schemes"
                   referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"

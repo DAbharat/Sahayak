@@ -32,6 +32,10 @@ class DraftRequest(BaseModel):
     profile_context: Optional[dict] = Field(
         None, description="Extracted UserProfile dict (optional enrichment)"
     )
+    department_name: Optional[str] = Field(
+    None,
+    description="Responsible department or authority for the scheme"
+    )
     scheme_name: Optional[str] = Field(
         None, description="Specific scheme name — only when known"
     )

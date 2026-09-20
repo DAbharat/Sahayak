@@ -28,6 +28,7 @@ func (r *SchemeRepository) CreateScheme(
 	state string,
 	sourceURL string,
 	lastVerifiedAt time.Time,
+	departmentName string,
 ) (sqlc.Scheme, error) {
 
 	params := sqlc.CreateSchemeParams{
@@ -38,6 +39,10 @@ func (r *SchemeRepository) CreateScheme(
 		LastVerifiedAt: pgtype.Timestamptz{
 			Time:  lastVerifiedAt,
 			Valid: true,
+		},
+		DepartmentName: pgtype.Text{
+			String: departmentName,
+			Valid:  true,
 		},
 	}
 
@@ -99,6 +104,7 @@ func (r *SchemeRepository) UpdateScheme(
 	state string,
 	sourceURL string,
 	lastVerifiedAt pgtype.Timestamptz,
+	departmentName string,
 ) (sqlc.Scheme, error) {
 
 	params := sqlc.UpdateSchemeParams{
@@ -108,6 +114,10 @@ func (r *SchemeRepository) UpdateScheme(
 		State:          state,
 		SourceUrl:      sourceURL,
 		LastVerifiedAt: lastVerifiedAt,
+		DepartmentName: pgtype.Text{
+			String: departmentName,
+			Valid:  true,
+		},
 	}
 
 	scheme, err := r.queries.UpdateScheme(ctx, params)

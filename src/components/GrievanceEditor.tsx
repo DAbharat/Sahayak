@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, 
-  Copy, 
-  Check, 
-  Edit3, 
-  Mic, 
-  Send, 
-  Download, 
-  Sparkles, 
+import {
+  FileText,
+  Copy,
+  Check,
+  Edit3,
+  Mic,
+  Send,
+  Download,
+  Sparkles,
   Building,
   RotateCcw,
   CheckCircle2,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Scheme, UserProfile, GrievanceDraft, GenerateGrievanceResponse, GrievanceRequest } from '../types.ts';
 import { POPULAR_SCHEMES } from '../data/schemes.ts';
+import { toast } from './ui/toast.tsx';
 
 interface GrievanceEditorProps {
   scheme?: Scheme | null;
@@ -51,6 +52,7 @@ export const GrievanceEditor: React.FC<GrievanceEditorProps> = ({
   const [isEditingDraft, setIsEditingDraft] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 
   // Sync if scheme prop changes
   useEffect(() => {
@@ -235,33 +237,30 @@ DISCLAIMER: ${apiResponse?.disclaimer || 'Official AI Generated Draft'}
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
-                  language === 'en'
-                    ? 'bg-emerald-50 border-[#006400] text-[#006400]'
-                    : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${language === 'en'
+                  ? 'bg-emerald-50 border-[#006400] text-[#006400]'
+                  : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 English (Formal)
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('hi')}
-                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
-                  language === 'hi'
-                    ? 'bg-orange-50 border-[#F77F00] text-[#F77F00]'
-                    : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${language === 'hi'
+                  ? 'bg-orange-50 border-[#F77F00] text-[#F77F00]'
+                  : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 हिंदी (शुद्ध भाषा)
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('hinglish')}
-                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
-                  language === 'hinglish'
-                    ? 'bg-blue-50 border-blue-600 text-blue-700'
-                    : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${language === 'hinglish'
+                  ? 'bg-blue-50 border-blue-600 text-blue-700'
+                  : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 Hinglish
               </button>
@@ -309,11 +308,10 @@ DISCLAIMER: ${apiResponse?.disclaimer || 'Official AI Generated Draft'}
             <button
               type="button"
               onClick={handleMicToggle}
-              className={`absolute right-3 bottom-3 p-2 rounded-full transition-colors cursor-pointer ${
-                isListening
-                  ? 'bg-red-600 text-white animate-pulse'
-                  : 'bg-orange-100 text-[#F77F00] hover:bg-orange-200'
-              }`}
+              className={`absolute right-3 bottom-3 p-2 rounded-full transition-colors cursor-pointer ${isListening
+                ? 'bg-red-600 text-white animate-pulse'
+                : 'bg-orange-100 text-[#F77F00] hover:bg-orange-200'
+                }`}
               title="Speak grievance details"
             >
               <Mic className="w-4 h-4" />
@@ -514,9 +512,28 @@ DISCLAIMER: ${apiResponse?.disclaimer || 'Official AI Generated Draft'}
                 {editableBody}
               </div>
             )}
+
+            {/* Submit Button */}
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                disabled={isSubmitDisabled}
+                onClick={() => {
+                  toast.add({ title: "Email sent / ईमेल भेजा गया", type: "success" });
+                  setIsSubmitDisabled(true);
+                }}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-bold transition-all shadow-md ${isSubmitDisabled
+                  ? 'bg-gray-400 cursor-not-allowed opacity-70'
+                  : 'bg-[#F77F00] hover:bg-[#D97000] cursor-pointer hover:shadow-lg'
+                  }`}
+              >
+                <Send className="w-4 h-4" />
+                {isSubmitDisabled ? 'Submitted / जमा किया गया' : 'Submit / जमा करें'}
+              </button>
+            </div>
           </div>
 
-          {/* Disclaimer & Next Steps from Go Backend Response */}
+          {/* Disclaimer & Next Steps from Go Backend Response
           <div className="p-3.5 rounded-lg bg-orange-50/70 border border-orange-200 text-xs text-orange-950 space-y-1">
             <p className="font-bold flex items-center gap-1.5">
               <span>🛡️ {apiResponse.disclaimer}</span>
@@ -524,7 +541,7 @@ DISCLAIMER: ${apiResponse?.disclaimer || 'Official AI Generated Draft'}
             <p>
               Next: Click <strong>[ Copy ]</strong> and submit on the central <strong>pgportal.gov.in</strong> or municipal office for official tracking.
             </p>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

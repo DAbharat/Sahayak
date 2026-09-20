@@ -86,9 +86,12 @@ func (h *GrievanceHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		UserText:       req.UserText,
 		DraftType:      req.DraftType,
 		Language:       req.Language,
-		ProfileContext: req.ProfileContext,
+		ProfileContext: preparedRequest.ProfileContext,
 		SchemeName:     req.SchemeName,
+		DepartmentName: preparedRequest.DepartmentName,
 	}
+	//log.Printf("AI REQUEST: %+v", aiRequest)
+	log.Printf("DEPARTMENT FROM PREPARED REQUEST: %q", preparedRequest.DepartmentName)
 
 	body, err := json.Marshal(aiRequest)
 	if err != nil {
@@ -135,6 +138,7 @@ func (h *GrievanceHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		Disclaimer:     draft.Disclaimer,
 		CorrelationID:  draft.CorrelationID,
 		SchemeName:     preparedRequest.SchemeName,
+		DepartmentName: preparedRequest.DepartmentName,
 	}
 
 	httpx.RespondWithJSON(w, http.StatusOK, response)

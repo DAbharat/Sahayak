@@ -14,11 +14,11 @@ import (
 )
 
 type SchemeRepo interface {
-	CreateScheme(ctx context.Context, name string, description string, state string, sourceURL string, lastVerifiedAt time.Time) (sqlc.Scheme, error)
+	CreateScheme(ctx context.Context, name string, description string, state string, sourceURL string, lastVerifiedAt time.Time, departmentName string) (sqlc.Scheme, error)
 	GetSchemeByID(ctx context.Context, id int64) (sqlc.Scheme, error)
 	ListSchemes(ctx context.Context) ([]sqlc.Scheme, error)
 	ListSchemesByState(ctx context.Context, state string) ([]sqlc.Scheme, error)
-	UpdateScheme(ctx context.Context, id int64, name string, description string, state string, sourceURL string, lastVerifiedAt pgtype.Timestamptz) (sqlc.Scheme, error)
+	UpdateScheme(ctx context.Context, id int64, name string, description string, state string, sourceURL string, lastVerifiedAt pgtype.Timestamptz, departmentName string) (sqlc.Scheme, error)
 	DeleteScheme(ctx context.Context, id int64) (int64, error)
 }
 
@@ -55,6 +55,7 @@ func (s *SchemeService) CreateScheme(
 		req.State,
 		req.SourceURL,
 		req.LastVerifiedAt,
+		req.DepartmentName,
 	)
 	if err != nil {
 		return dto.SchemeResponse{}, fmt.Errorf("create scheme: %w", err)
@@ -67,6 +68,7 @@ func (s *SchemeService) CreateScheme(
 		State:          scheme.State,
 		SourceURL:      scheme.SourceUrl,
 		LastVerifiedAt: scheme.LastVerifiedAt.Time,
+		DepartmentName: scheme.DepartmentName.String,
 	}, nil
 }
 
@@ -122,6 +124,7 @@ func mapScheme(scheme sqlc.Scheme) dto.SchemeResponse {
 		State:          scheme.State,
 		SourceURL:      scheme.SourceUrl,
 		LastVerifiedAt: scheme.LastVerifiedAt.Time,
+		DepartmentName: scheme.DepartmentName.String,
 	}
 }
 

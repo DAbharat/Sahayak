@@ -7,9 +7,12 @@ type GrievanceRequest struct {
 	Language       string         `json:"language"`
 	ProfileContext ProfileContext `json:"profile_context"`
 	SchemeName     string         `json:"scheme_name"`
+	DepartmentName string         `json:"department_name"`
 }
 
 type ProfileContext struct {
+	Name          string `json:"name"`
+	District      string `json:"district"`
 	State         string `json:"state"`
 	Occupation    string `json:"occupation"`
 	MonthlyIncome int64  `json:"monthly_income"`
@@ -39,4 +42,5 @@ type GenerateGrievanceResponse struct {
 	Disclaimer     string         `json:"disclaimer"`
 	CorrelationID  string         `json:"correlation_id"`
 	SchemeName     string         `json:"scheme_name"`
+	DepartmentName string         `json:"department_name"`
 }

@@ -12,19 +12,22 @@ import (
 )
 
 const createScheme = `-- name: CreateScheme :one
+
 INSERT INTO schemes (
     name,
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 )
 VALUES (
     $1,
     $2,
     $3,
     $4,
-    $5
+    $5,
+    $6
 )
 RETURNING
     id,
@@ -32,7 +35,8 @@ RETURNING
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 `
 
 type CreateSchemeParams struct {
@@ -41,6 +45,7 @@ type CreateSchemeParams struct {
 	State          string             `json:"state"`
 	SourceUrl      string             `json:"source_url"`
 	LastVerifiedAt pgtype.Timestamptz `json:"last_verified_at"`
+	DepartmentName pgtype.Text        `json:"department_name"`
 }
 
 func (q *Queries) CreateScheme(ctx context.Context, arg CreateSchemeParams) (Scheme, error) {
@@ -50,6 +55,7 @@ func (q *Queries) CreateScheme(ctx context.Context, arg CreateSchemeParams) (Sch
 		arg.State,
 		arg.SourceUrl,
 		arg.LastVerifiedAt,
+		arg.DepartmentName,
 	)
 	var i Scheme
 	err := row.Scan(
@@ -59,11 +65,13 @@ func (q *Queries) CreateScheme(ctx context.Context, arg CreateSchemeParams) (Sch
 		&i.State,
 		&i.SourceUrl,
 		&i.LastVerifiedAt,
+		&i.DepartmentName,
 	)
 	return i, err
 }
 
 const deleteScheme = `-- name: DeleteScheme :one
+
 DELETE FROM schemes
 WHERE id = $1
 RETURNING id
@@ -77,13 +85,15 @@ func (q *Queries) DeleteScheme(ctx context.Context, id int64) (int64, error) {
 }
 
 const getSchemeByID = `-- name: GetSchemeByID :one
+
 SELECT
     id,
     name,
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 FROM schemes
 WHERE id = $1
 `
@@ -98,18 +108,21 @@ func (q *Queries) GetSchemeByID(ctx context.Context, id int64) (Scheme, error) {
 		&i.State,
 		&i.SourceUrl,
 		&i.LastVerifiedAt,
+		&i.DepartmentName,
 	)
 	return i, err
 }
 
 const listSchemes = `-- name: ListSchemes :many
+
 SELECT
     id,
     name,
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 FROM schemes
 ORDER BY id
 `
@@ -130,6 +143,7 @@ func (q *Queries) ListSchemes(ctx context.Context) ([]Scheme, error) {
 			&i.State,
 			&i.SourceUrl,
 			&i.LastVerifiedAt,
+			&i.DepartmentName,
 		); err != nil {
 			return nil, err
 		}
@@ -142,13 +156,15 @@ func (q *Queries) ListSchemes(ctx context.Context) ([]Scheme, error) {
 }
 
 const listSchemesByState = `-- name: ListSchemesByState :many
+
 SELECT
     id,
     name,
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 FROM schemes
 WHERE state = $1
 ORDER BY id
@@ -170,6 +186,7 @@ func (q *Queries) ListSchemesByState(ctx context.Context, state string) ([]Schem
 			&i.State,
 			&i.SourceUrl,
 			&i.LastVerifiedAt,
+			&i.DepartmentName,
 		); err != nil {
 			return nil, err
 		}
@@ -182,13 +199,15 @@ func (q *Queries) ListSchemesByState(ctx context.Context, state string) ([]Schem
 }
 
 const updateScheme = `-- name: UpdateScheme :one
+
 UPDATE schemes
 SET
     name = $2,
     description = $3,
     state = $4,
     source_url = $5,
-    last_verified_at = $6
+    last_verified_at = $6,
+    department_name = $7
 WHERE id = $1
 RETURNING
     id,
@@ -196,7 +215,8 @@ RETURNING
     description,
     state,
     source_url,
-    last_verified_at
+    last_verified_at,
+    department_name
 `
 
 type UpdateSchemeParams struct {
@@ -206,6 +226,7 @@ type UpdateSchemeParams struct {
 	State          string             `json:"state"`
 	SourceUrl      string             `json:"source_url"`
 	LastVerifiedAt pgtype.Timestamptz `json:"last_verified_at"`
+	DepartmentName pgtype.Text        `json:"department_name"`
 }
 
 func (q *Queries) UpdateScheme(ctx context.Context, arg UpdateSchemeParams) (Scheme, error) {
@@ -216,6 +237,7 @@ func (q *Queries) UpdateScheme(ctx context.Context, arg UpdateSchemeParams) (Sch
 		arg.State,
 		arg.SourceUrl,
 		arg.LastVerifiedAt,
+		arg.DepartmentName,
 	)
 	var i Scheme
 	err := row.Scan(
@@ -225,6 +247,7 @@ func (q *Queries) UpdateScheme(ctx context.Context, arg UpdateSchemeParams) (Sch
 		&i.State,
 		&i.SourceUrl,
 		&i.LastVerifiedAt,
+		&i.DepartmentName,
 	)
 	return i, err
 }

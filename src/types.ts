@@ -51,12 +51,16 @@ export interface UserProfile {
   id?: number;
   account_id?: number;
   state: string;
+  district?: string;
   occupation: string;
   monthly_income?: number;
   age?: number;
   gender?: Gender;
   children_count?: number;
   created_at?: string;
+  caste_category?: string;
+  is_registered_worker?: boolean;
+  has_bank_account?: boolean;
   
   // UI Display & Helper fields
   name?: string;

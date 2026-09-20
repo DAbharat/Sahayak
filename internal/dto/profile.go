@@ -3,6 +3,7 @@ package dto
 import "time"
 
 type CreateProfileRequest struct {
+	Name                string   `json:"name"`
 	State               *string  `json:"state"`
 	District            *string  `json:"district"`
 	Occupation          string   `json:"occupation"`
@@ -21,6 +22,7 @@ type CreateProfileRequest struct {
 }
 
 type ProfileResponse struct {
+	Name                string    `json:"name"`
 	ID                  int64     `json:"id"`
 	AccountID           int64     `json:"account_id"`
 	State               *string   `json:"state"`

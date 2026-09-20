@@ -81,6 +81,7 @@ type Profile struct {
 	HasBankAccount      pgtype.Bool        `json:"has_bank_account"`
 	DocumentsAvailable  []string           `json:"documents_available"`
 	Language            string             `json:"language"`
+	Name                string             `json:"name"`
 }
 
 type RefreshToken struct {
@@ -98,6 +99,7 @@ type Scheme struct {
 	State          string             `json:"state"`
 	SourceUrl      string             `json:"source_url"`
 	LastVerifiedAt pgtype.Timestamptz `json:"last_verified_at"`
+	DepartmentName pgtype.Text        `json:"department_name"`
 }
 
 type SchemeRule struct {

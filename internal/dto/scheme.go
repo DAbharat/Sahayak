@@ -8,6 +8,7 @@ type CreateSchemeRequest struct {
 	State          string    `json:"state"`
 	SourceURL      string    `json:"source_url"`
 	LastVerifiedAt time.Time `json:"last_verified_at"`
+	DepartmentName string    `json:"department_name"`
 }
 
 type SchemeResponse struct {
@@ -17,4 +18,5 @@ type SchemeResponse struct {
 	State          string    `json:"state"`
 	SourceURL      string    `json:"source_url"`
 	LastVerifiedAt time.Time `json:"last_verified_at"`
+	DepartmentName string    `json:"department_name"`
 }

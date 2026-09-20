@@ -11,38 +11,27 @@ import { ProfilePage } from './app/profile/page.tsx';
 import { POPULAR_SCHEMES } from './data/schemes.ts';
 import { UserProfile, UserAuth, Scheme } from './types.ts';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.tsx';
-import { localApi } from './services/localData.ts';
+import { useAuth } from './hooks/use-Auth.ts';
 
 function MainApp() {
   // Navigation State
   const [currentRoute, setCurrentRoute] = useState<string>('/');
   const [routeParams, setRouteParams] = useState<any>({});
-  
+
   // App-level state from LanguageContext
   const { lang, toggleLang } = useLanguage();
   const [textSize, setTextSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
-  
-  const [userAuth, setUserAuth] = useState<UserAuth>({
-    isAuthenticated: false,
-    name: 'नागरिक / Citizen',
-    phone: '',
-    state: 'Haryana'
-  });
 
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: 'नागरिक / Citizen',
-    state: 'Haryana',
-    occupation: 'Street Vendor',
-    monthly_income: 15000,
-    monthlyIncome: 15000,
-    children_count: 2,
-    children: 2,
-    age: 34,
-    gender: 'MALE',
-    rawInput: 'मैं हरियाणा में स्ट्रीट वेंडर हूं। मेरी महीने की कमाई करीब 15 हजार है और मेरे दो बच्चे हैं।',
-    inputMode: 'voice'
-  });
+  const {
+    userAuth,
+    userProfile,
+    setUserProfile,
+    handleLoginSuccess,
+    handleLogout,
+    authenticate,
+    quickLogin
+  } = useAuth();
 
   const [selectedSchemeId, setSelectedSchemeId] = useState<string>('pm-svanidhi');
   const [grievanceTargetScheme, setGrievanceTargetScheme] = useState<Scheme | null>(null);
@@ -94,68 +83,7 @@ function MainApp() {
     document.documentElement.classList.add(`text-size-${size}`);
   };
 
-  const handleLoginSuccess = (authData: UserAuth) => {
-    setUserAuth(authData);
-    setUserProfile(prev => ({
-      ...prev,
-      name: authData.name,
-      state: authData.state || prev.state
-    }));
-  };
 
-  const handleLogout = () => {
-    setUserAuth({
-      isAuthenticated: false,
-      name: 'नागरिक / Citizen',
-      phone: '',
-      state: 'Haryana'
-    });
-  };
-
-  const authenticate = async (
-    mode: 'login' | 'signup',
-    credentials: { email: string; password: string }
-  ): Promise<UserAuth> => {
-    if (mode === 'signup') {
-      await localApi.register(credentials);
-    }
-
-    const loginResponse = await localApi.login(credentials);
-    const profile = await localApi.getProfile(loginResponse.id);
-
-    return {
-      isAuthenticated: true,
-      id: loginResponse.id,
-      email: loginResponse.email,
-      access_token: loginResponse.access_token,
-      refresh_token: loginResponse.refresh_token,
-      name: profile ? `${profile.occupation} (${profile.state})` : loginResponse.email.split('@')[0],
-      state: profile?.state || 'Maharashtra'
-    };
-  };
-
-  const quickLogin = async (role: 'farmer' | 'vendor' | 'artisan'): Promise<UserAuth> => {
-    const emailByRole = {
-      farmer: 'farmer@sahayak.gov.in',
-      vendor: 'vendor@sahayak.gov.in',
-      artisan: 'artisan@sahayak.gov.in'
-    } as const;
-    const loginResponse = await localApi.login({
-      email: emailByRole[role],
-      password: 'password123'
-    });
-    const profile = await localApi.getProfile(loginResponse.id);
-
-    return {
-      isAuthenticated: true,
-      id: loginResponse.id,
-      email: loginResponse.email,
-      access_token: loginResponse.access_token,
-      refresh_token: loginResponse.refresh_token,
-      name: profile ? `${profile.occupation} (${profile.state})` : emailByRole[role].split('@')[0],
-      state: profile?.state || (role === 'vendor' ? 'Haryana' : role === 'farmer' ? 'Maharashtra' : 'Rajasthan')
-    };
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#333333] w-full max-w-full overflow-x-hidden">

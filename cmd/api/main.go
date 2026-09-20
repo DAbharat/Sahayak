@@ -16,6 +16,7 @@ import (
 	"github.com/DAbharat/Sahayak/internal/repository"
 	"github.com/DAbharat/Sahayak/internal/router"
 	"github.com/DAbharat/Sahayak/internal/service"
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 )
 
@@ -89,6 +90,13 @@ func main() {
 		authMiddleware,
 	)
 
+	corsHandler := handlers.CORS(
+		handlers.AllowedOrigins([]string{"http://localhost:5173"}),
+		handlers.AllowedMethods([]string{"POST", "GET", "PATCH", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+		handlers.AllowCredentials(),
+	)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9000"
@@ -98,7 +106,7 @@ func main() {
 
 	server := http.Server{
 		Addr:              serverAddr,
-		Handler:           r,
+		Handler:           corsHandler(r),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,

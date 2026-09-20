@@ -13,6 +13,7 @@ import (
 
 const createProfile = `-- name: CreateProfile :one
 INSERT INTO profiles (
+    name,
     account_id,
     state,
     district,
@@ -32,12 +33,13 @@ INSERT INTO profiles (
 )
 VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8,
-    $9, $10, $11, $12, $13, $14, $15, $16
+    $9, $10, $11, $12, $13, $14, $15, $16, $17
 )
-RETURNING id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language
+RETURNING id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language, name
 `
 
 type CreateProfileParams struct {
+	Name                string      `json:"name"`
 	AccountID           int64       `json:"account_id"`
 	State               pgtype.Text `json:"state"`
 	District            pgtype.Text `json:"district"`
@@ -58,6 +60,7 @@ type CreateProfileParams struct {
 
 func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) (Profile, error) {
 	row := q.db.QueryRow(ctx, createProfile,
+		arg.Name,
 		arg.AccountID,
 		arg.State,
 		arg.District,
@@ -95,12 +98,13 @@ func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) (P
 		&i.HasBankAccount,
 		&i.DocumentsAvailable,
 		&i.Language,
+		&i.Name,
 	)
 	return i, err
 }
 
 const getProfileByAccountID = `-- name: GetProfileByAccountID :one
-SELECT id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language
+SELECT id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language, name
 FROM profiles
 WHERE account_id = $1
 `
@@ -127,12 +131,13 @@ func (q *Queries) GetProfileByAccountID(ctx context.Context, accountID int64) (P
 		&i.HasBankAccount,
 		&i.DocumentsAvailable,
 		&i.Language,
+		&i.Name,
 	)
 	return i, err
 }
 
 const getProfileByID = `-- name: GetProfileByID :one
-SELECT id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language
+SELECT id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language, name
 FROM profiles
 WHERE id = $1
 `
@@ -159,6 +164,7 @@ func (q *Queries) GetProfileByID(ctx context.Context, id int64) (Profile, error)
 		&i.HasBankAccount,
 		&i.DocumentsAvailable,
 		&i.Language,
+		&i.Name,
 	)
 	return i, err
 }
@@ -166,27 +172,29 @@ func (q *Queries) GetProfileByID(ctx context.Context, id int64) (Profile, error)
 const updateProfile = `-- name: UpdateProfile :one
 UPDATE profiles
 SET
-    state = $2,
-    district = $3,
-    occupation = $4,
-    monthly_income = $5,
-    income_currency = $6,
-    family_size = $7,
-    children_count = $8,
-    children_school_going = $9,
-    age = $10,
-    gender = $11,
-    is_registered_worker = $12,
-    caste_category = $13,
-    has_bank_account = $14,
-    documents_available = $15,
-    language = $16
+    name = $2,
+    state = $3,
+    district = $4,
+    occupation = $5,
+    monthly_income = $6,
+    income_currency = $7,
+    family_size = $8,
+    children_count = $9,
+    children_school_going = $10,
+    age = $11,
+    gender = $12,
+    is_registered_worker = $13,
+    caste_category = $14,
+    has_bank_account = $15,
+    documents_available = $16,
+    language = $17
 WHERE account_id = $1
-RETURNING id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language
+RETURNING id, account_id, state, occupation, monthly_income, age, gender, children_count, created_at, district, income_currency, family_size, children_school_going, is_registered_worker, caste_category, has_bank_account, documents_available, language, name
 `
 
 type UpdateProfileParams struct {
 	AccountID           int64       `json:"account_id"`
+	Name                string      `json:"name"`
 	State               pgtype.Text `json:"state"`
 	District            pgtype.Text `json:"district"`
 	Occupation          string      `json:"occupation"`
@@ -207,6 +215,7 @@ type UpdateProfileParams struct {
 func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (Profile, error) {
 	row := q.db.QueryRow(ctx, updateProfile,
 		arg.AccountID,
+		arg.Name,
 		arg.State,
 		arg.District,
 		arg.Occupation,
@@ -243,6 +252,7 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (P
 		&i.HasBankAccount,
 		&i.DocumentsAvailable,
 		&i.Language,
+		&i.Name,
 	)
 	return i, err
 }

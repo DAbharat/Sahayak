@@ -178,21 +178,27 @@ export const GovHeader: React.FC<GovHeaderProps> = ({
             {/* User Auth Action */}
             {userAuth.isAuthenticated ? (
               <div className="flex items-center gap-1.5 sm:gap-2 bg-emerald-50 border border-emerald-300 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shrink-0">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#006400] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0">
-                  {userAuth.name ? userAuth.name.charAt(0) : 'न'}
-                </div>
-                <div className="text-left hidden sm:block">
-                  <span className="text-xs font-bold text-gray-900 block leading-tight truncate max-w-[100px]">
-                    {userAuth.name || (lang === 'hi' ? 'नागरिक' : 'Citizen')}
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold block leading-none">
-                    {lang === 'hi' ? `सत्यापित नागरिक (${userAuth.state})` : `Verified Citizen (${userAuth.state})`}
-                  </span>
+                <div 
+                  onClick={() => onNavigate('/profile')}
+                  className="flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  title={lang === 'hi' ? 'प्रोफ़ाइल देखें' : 'View Profile'}
+                >
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#006400] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0">
+                    {userAuth.name ? userAuth.name.charAt(0) : 'न'}
+                  </div>
+                  <div className="text-left hidden sm:block">
+                    <span className="text-xs font-bold text-gray-900 block leading-tight truncate max-w-[100px]">
+                      {userAuth.name || (lang === 'hi' ? 'नागरिक' : 'Citizen')}
+                    </span>
+                    <span className="text-[10px] text-emerald-700 font-semibold block leading-none">
+                      {lang === 'hi' ? `सत्यापित नागरिक (${userAuth.state})` : `Verified Citizen (${userAuth.state})`}
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={onLogout}
-                  className="text-[11px] text-red-600 font-semibold hover:underline ml-1 cursor-pointer shrink-0"
+                  className="text-[11px] text-red-600 font-semibold hover:underline ml-1 cursor-pointer shrink-0 border-l border-emerald-200 pl-2"
                 >
                   {lang === 'hi' ? 'लॉगआउट' : 'Logout'}
                 </button>

@@ -3,6 +3,7 @@ import { User, MapPin, Briefcase, IndianRupee, Users, ShieldCheck, CheckCircle2,
 import { UserProfile, UserAuth } from '../../types.ts';
 import { ProfileCard } from '../../components/ProfileCard.tsx';
 import { POPULAR_SCHEMES } from '../../data/schemes.ts';
+import { updateProfile, createProfile } from '../../services/profile.service.ts';
 
 interface ProfilePageProps {
   userProfile: UserProfile;
@@ -19,25 +20,74 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onNavigate,
   onSelectScheme
 }) => {
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleProfileConfirm = async (updated: UserProfile) => {
+    if (userAuth.isAuthenticated && userAuth.id) {
+      setIsSaving(true);
+      try {
+        const payload = {
+          name: updated.name || userProfile.name || userAuth.name || '',
+          occupation: updated.occupation || '',
+          monthly_income: updated.monthlyIncome || updated.monthly_income || 0,
+          income_currency: 'INR',
+          family_size: (updated.children || updated.children_count || 0) + 2,
+          children_count: updated.children || updated.children_count || 0,
+          children_school_going: false,
+          age: updated.age || 30,
+          gender: updated.gender || 'MALE',
+          is_registered_worker: updated.is_registered_worker || false,
+          caste_category: updated.caste_category || 'GENERAL',
+          has_bank_account: updated.has_bank_account ?? true,
+          documents_available: [],
+          language: 'hi',
+          state: updated.state || '',
+          district: updated.district || '',
+        };
+
+        if (userProfile.id || updated.id) {
+          await updateProfile(userAuth.id, payload);
+        } else {
+          await createProfile(userAuth.id, payload);
+        }
+      } catch (err) {
+        console.error("Failed to sync profile to backend", err);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+    onUpdateProfile(updated);
+  };
+
+  const displayName = userAuth.isAuthenticated && userAuth.name ? userAuth.name : userProfile.name;
+  const initials = displayName 
+    ? displayName.split(/[\s_()\-]+/).filter(Boolean).map(n => n[0]).join('').toUpperCase().substring(0, 2) 
+    : 'न';
+
   return (
     <div className="bg-[#F8F9FA] min-h-screen py-8 px-4 text-left">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Profile Header */}
         <div className="bg-white rounded-xl border-2 border-orange-200 p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-[#006400] text-white flex items-center justify-center text-2xl font-black shadow-md">
-              {userProfile.name ? userProfile.name.charAt(0) : 'न'}
+              {initials}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-black text-gray-900">
-                  {userAuth.isAuthenticated ? userAuth.name : userProfile.name}
+                  {displayName}
                 </h1>
                 <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
                   सत्यापित नागरिक / Active Profile
                 </span>
               </div>
-              <p className="text-xs text-gray-600 mt-1">
+              {userProfile.occupation && (
+                <p className="text-sm font-semibold text-gray-700 mt-1">
+                  {userProfile.occupation}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
                 Aadhaar Reference: XXXX-XXXX-4892 • State: {userProfile.state} • Jan Parichay SSO
               </p>
             </div>
@@ -55,11 +105,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column (2 Cols): Profile Verification Card & DigiLocker Docs */}
           <div className="lg:col-span-2 space-y-6">
-            <ProfileCard
-              profile={userProfile}
-              onConfirm={(updated) => onUpdateProfile(updated)}
-              onEdit={() => onNavigate('/onboarding')}
-            />
+            <div className="relative">
+              {isSaving && (
+                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-[#F77F00] font-bold">
+                    <span className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    Saving to Go Backend...
+                  </div>
+                </div>
+              )}
+              <ProfileCard
+                profile={userProfile}
+                onConfirm={handleProfileConfirm}
+              />
+            </div>
 
             {/* DigiLocker Digital Document Wallet Integration */}
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs space-y-3">

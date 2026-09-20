@@ -14,6 +14,7 @@ import (
 type ProfileRepo interface {
 	CreateProfile(
 		ctx context.Context,
+		name string,
 		accountID int64,
 		state *string,
 		district *string,
@@ -38,6 +39,7 @@ type ProfileRepo interface {
 
 	UpdateProfile(
 		ctx context.Context,
+		name string,
 		accountID int64,
 		state *string,
 		district *string,
@@ -68,6 +70,10 @@ func NewProfileService(profileRepo ProfileRepo) *ProfileService {
 }
 
 func (s *ProfileService) validateProfile(req dto.CreateProfileRequest) error {
+	if strings.TrimSpace(req.Name) == "" {
+		return fmt.Errorf("invalid name")
+	}
+
 	if strings.TrimSpace(req.Occupation) == "" {
 		return ErrInvalidOccupation
 	}
@@ -115,6 +121,7 @@ func (s *ProfileService) CreateProfile(
 
 	profile, err := s.profileRepo.CreateProfile(
 		ctx,
+		req.Name,
 		accountID,
 		req.State,
 		req.District,
@@ -197,6 +204,7 @@ func (s *ProfileService) UpdateProfile(
 
 	profile, err := s.profileRepo.UpdateProfile(
 		ctx,
+		req.Name,
 		accountID,
 		req.State,
 		req.District,
@@ -284,6 +292,7 @@ func mapProfile(profile sqlc.Profile) dto.ProfileResponse {
 
 	return dto.ProfileResponse{
 		ID:                  profile.ID,
+		Name:                profile.Name,
 		AccountID:           profile.AccountID,
 		State:               state,
 		District:            district,

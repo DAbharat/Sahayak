@@ -21,6 +21,7 @@ func NewProfileRepository(queries *sqlc.Queries) *ProfileRepository {
 
 func (r *ProfileRepository) CreateProfile(
 	ctx context.Context,
+	name string,
 	accountID int64,
 	state *string,
 	district *string,
@@ -40,6 +41,7 @@ func (r *ProfileRepository) CreateProfile(
 ) (sqlc.Profile, error) {
 
 	params := sqlc.CreateProfileParams{
+		Name:                name,
 		AccountID:           accountID,
 		State:               pgtypeText(state),
 		District:            pgtypeText(district),
@@ -102,6 +104,7 @@ func (r *ProfileRepository) GetProfileByID(
 
 func (r *ProfileRepository) UpdateProfile(
 	ctx context.Context,
+	name string,
 	accountID int64,
 	state *string,
 	district *string,
@@ -121,6 +124,7 @@ func (r *ProfileRepository) UpdateProfile(
 ) (sqlc.Profile, error) {
 
 	params := sqlc.UpdateProfileParams{
+		Name:                name,
 		AccountID:           accountID,
 		State:               pgtypeText(state),
 		District:            pgtypeText(district),

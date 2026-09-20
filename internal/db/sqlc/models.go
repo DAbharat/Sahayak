@@ -81,6 +81,7 @@ type Profile struct {
 	HasBankAccount      pgtype.Bool        `json:"has_bank_account"`
 	DocumentsAvailable  []string           `json:"documents_available"`
 	Language            string             `json:"language"`
+	Name                string             `json:"name"`
 }
 
 type RefreshToken struct {

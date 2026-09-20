@@ -61,9 +61,9 @@ func main() {
 	accountService := service.NewAccountService(accountRepo, refreshTokenRepo, jwtSecret)
 	profileService := service.NewProfileService(profileRepo)
 	schemeService := service.NewSchemeService(schemeRepo)
+	grievanceService := service.NewGrievanceService(profileRepo, schemeRepo)
 	schemeRuleService := service.NewSchemeRuleService(schemeRuleRepo)
 	eligibilityService := service.NewEligibilityService(profileRepo, schemeRepo, schemeRuleRepo)
-	grievanceService := service.NewGrievanceService(profileRepo, schemeRepo)
 
 	// Handlers
 

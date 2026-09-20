@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/DAbharat/Sahayak/internal/db/sqlc"
@@ -40,13 +41,16 @@ func (s *GrievanceService) PrepareRequest(
 		return dto.GenerateGrievanceResponse{}, ErrInvalidUserText
 	}
 
+	profileContext := req.ProfileContext
 	profile, err := s.profileRepo.GetProfileByAccountID(ctx, accountID)
+	log.Printf("PROFILE FROM DB: %+v", profile)
 	if err != nil {
-		if errors.Is(err, repository.ErrProfileNotFound) {
-			return dto.GenerateGrievanceResponse{}, ErrProfileNotFound
+		if !errors.Is(err, repository.ErrProfileNotFound) {
+			return dto.GenerateGrievanceResponse{}, fmt.Errorf("get profile: %w", err)
 		}
-
-		return dto.GenerateGrievanceResponse{}, fmt.Errorf("get profile: %w", err)
+	} else {
+		log.Printf("PROFILE FROM DB: %+v", profile)
+		profileContext = getProfileContext(profile)
 	}
 
 	scheme, err := s.schemeRepo.GetSchemeByID(ctx, req.SchemeID)
@@ -62,8 +66,9 @@ func (s *GrievanceService) PrepareRequest(
 		UserText:       req.UserText,
 		DraftType:      "grievance",
 		Language:       req.Language,
-		ProfileContext: getProfileContext(profile),
+		ProfileContext: profileContext,
 		SchemeName:     scheme.Name,
+		DepartmentName: scheme.DepartmentName.String,
 	}, nil
 }
 
@@ -101,8 +106,15 @@ func getProfileContext(profile sqlc.Profile) dto.ProfileContext {
 		gender = string(profile.Gender.Gender)
 	}
 
+	var district string
+	if profile.District.Valid {
+		district = profile.District.String
+	}
+
 	return dto.ProfileContext{
+		Name:          profile.Name,
 		State:         state,
+		District:      district,
 		Occupation:    profile.Occupation,
 		MonthlyIncome: monthlyIncome,
 		Age:           age,

@@ -99,6 +99,7 @@ type Scheme struct {
 	State          string             `json:"state"`
 	SourceUrl      string             `json:"source_url"`
 	LastVerifiedAt pgtype.Timestamptz `json:"last_verified_at"`
+	DepartmentName pgtype.Text        `json:"department_name"`
 }
 
 type SchemeRule struct {

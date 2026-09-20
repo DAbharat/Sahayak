@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 
 export type CreateAccountRequest = {
     email: string;
-    password?: string;
+    password: string;
 };
 
 export type AccountResponse = {
@@ -13,7 +13,7 @@ export type AccountResponse = {
 
 export type LoginAccountRequest = {
     email: string;
-    password?: string;
+    password: string;
 };
 
 export type LoginAccountResponse = {

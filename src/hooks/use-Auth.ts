@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserAuth, UserProfile } from '../types.ts';
+import { UserAuth, UserProfile, Gender } from '../types.ts';
 import { loginAccount, registerAccount } from '../services/account.service.ts';
 import { getProfile } from '../services/profile.service.ts';
 
@@ -57,6 +57,28 @@ export function useAuth() {
     }
   }, [userProfile]);
 
+  // Sync profile from backend on load to ensure we have the latest data (e.g. correct name)
+  useEffect(() => {
+    let mounted = true;
+    const fetchLatestProfile = async () => {
+      if (userAuth.isAuthenticated && userAuth.id) {
+        try {
+          const profile = await getProfile(userAuth.id);
+          if (mounted && profile) {
+            setUserProfile(prev => ({ ...prev, ...profile, gender: profile.gender as Gender, name: profile.name || prev.name }));
+            if (profile.name && profile.name !== userAuth.name) {
+              setUserAuth(prev => ({ ...prev, name: profile.name }));
+            }
+          }
+        } catch (error) {
+          console.warn("Could not sync profile on load", error);
+        }
+      }
+    };
+    fetchLatestProfile();
+    return () => { mounted = false; };
+  }, [userAuth.id, userAuth.isAuthenticated]);
+
   const handleLoginSuccess = (authData: UserAuth) => {
     setUserAuth(authData);
     setUserProfile(prev => ({
@@ -113,7 +135,7 @@ export function useAuth() {
       email: loginResponse.email,
       access_token: loginResponse.access_token,
       refresh_token: loginResponse.refresh_token,
-      name: profile && profile.occupation ? `${profile.occupation} (${profile.state})` : loginResponse.email.split('@')[0],
+      name: profile?.name || (profile && profile.occupation ? `${profile.occupation} (${profile.state})` : loginResponse.email.split('@')[0]),
       state: profile?.state || 'Maharashtra'
     };
   };
@@ -150,7 +172,7 @@ export function useAuth() {
       email: loginResponse.email,
       access_token: loginResponse.access_token,
       refresh_token: loginResponse.refresh_token,
-      name: profile && profile.occupation ? `${profile.occupation} (${profile.state})` : emailByRole[role].split('@')[0],
+      name: profile?.name || (profile && profile.occupation ? `${profile.occupation} (${profile.state})` : emailByRole[role].split('@')[0]),
       state: profile?.state || (role === 'vendor' ? 'Haryana' : role === 'farmer' ? 'Maharashtra' : 'Rajasthan')
     };
   };

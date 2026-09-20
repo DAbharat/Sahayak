@@ -12,6 +12,7 @@ import { POPULAR_SCHEMES } from './data/schemes.ts';
 import { UserProfile, UserAuth, Scheme } from './types.ts';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.tsx';
 import { useAuth } from './hooks/use-Auth.ts';
+import { Toaster } from './components/ui/toast.tsx';
 
 function MainApp() {
   // Navigation State
@@ -36,30 +37,29 @@ function MainApp() {
   const [selectedSchemeId, setSelectedSchemeId] = useState<string>('pm-svanidhi');
   const [grievanceTargetScheme, setGrievanceTargetScheme] = useState<Scheme | null>(null);
 
-  // Sync hash routing with browser URL
+  // Sync path routing with browser URL
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '') || '/';
-      if (hash.startsWith('/schemes/')) {
-        const id = hash.replace('/schemes/', '');
+    const handleLocationChange = () => {
+      const path = window.location.pathname || '/';
+      if (path.startsWith('/schemes/') && path !== '/schemes') {
+        const id = path.replace('/schemes/', '');
         setSelectedSchemeId(id);
         setCurrentRoute('/schemes/[id]');
       } else {
-        setCurrentRoute(hash);
+        setCurrentRoute(path);
       }
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    handleLocationChange();
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
   const navigate = (route: string, params: any = {}) => {
     setRouteParams(params);
-    if (route === '/schemes/[id]') {
-      window.location.hash = `/schemes/${selectedSchemeId}`;
-    } else {
-      window.location.hash = route;
+    const targetPath = route === '/schemes/[id]' ? `/schemes/${selectedSchemeId}` : route;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
     }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -67,7 +67,10 @@ function MainApp() {
 
   const handleSelectScheme = (schemeId: string) => {
     setSelectedSchemeId(schemeId);
-    window.location.hash = `/schemes/${schemeId}`;
+    const targetPath = `/schemes/${schemeId}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
+    }
     setCurrentRoute('/schemes/[id]');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -102,6 +105,7 @@ function MainApp() {
 
       {/* Main Content Area */}
       <main id="main-content" className="flex-1 w-full max-w-full overflow-x-hidden">
+        <Toaster />
         {currentRoute === '/' && (
           <HomePage
             onNavigate={navigate}

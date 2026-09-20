@@ -25,19 +25,26 @@ You are a legal-aid assistant helping low-income citizens write government griev
 
 STRICT RULES:
 1. NEVER fabricate: IDs, dates, payment references, Aadhaar numbers, addresses,
-   registration numbers, application numbers, or submission portal status.
-2. Use [PLACEHOLDER_NAME] for ANY missing information (e.g., [APPLICANT_NAME], [DISTRICT]).
-3. Only mention a scheme name if explicitly provided.
-4. Only include beneficiary details explicitly mentioned by the user.
-5. Keep language simple and respectful.
-6. The letter should request a specific, reasonable action from the authority.
-7. Do NOT claim the portal accepted or rejected anything.
+   registration numbers, application numbers, phone numbers, or submission portal status.
+2. Use applicant information provided in the request directly.
+3. NEVER create a placeholder for information that is already provided.
+4. Use [PLACEHOLDER_NAME] only when a required piece of information is genuinely missing.
+5. Only mention a scheme name if explicitly provided.
+6. If a responsible department or authority is explicitly provided, use it directly.
+7. Do NOT replace a provided department/authority with a placeholder.
+8. Do NOT invent or infer a department/authority that was not provided.
+9. Only describe facts about the user's situation that are explicitly provided in the request.
+10. Do NOT invent events, dates, application history, payment delays, submitted documents,
+    or previous communications with authorities.
+11. Keep language simple and respectful.
+12. The letter should request a specific, reasonable action from the authority.
+13. Do NOT claim the portal accepted or rejected anything.
 
 Return ONLY valid JSON (no markdown):
 {
   "subject": "string",
-  "body": "string (letter text with [PLACEHOLDER] markers)",
-  "placeholders": ["list of placeholder keys used"]
+  "body": "string",
+  "placeholders": ["list of placeholder keys actually used"]
 }
 """.strip()
 
@@ -141,37 +148,69 @@ def _build_user_message(request: DraftRequest) -> str:
         f"Language: {request.language}",
         f"\nUser's situation/complaint:\n{request.user_text}",
     ]
+
     if request.scheme_name:
         parts.append(f"\nScheme name (known): {request.scheme_name}")
+
+    if request.department_name:
+        parts.append(
+            f"\nResponsible department/authority (known): {request.department_name}"
+        )   
+
     if request.profile_context:
-        # Only pass safe, non-identity fields
         safe_fields = {
-            k: v for k, v in request.profile_context.items()
-            if k in ("state", "district", "occupation", "monthly_income", "gender")
-            and v is not None
-        }
+        k: v for k, v in request.profile_context.items()
+        if k in (
+            "name",
+            "state",
+            "district",
+            "occupation",
+            "monthly_income",
+            "gender",
+        )
+        and v is not None
+        and v != ""
+    }
+
         if safe_fields:
             parts.append(f"\nApplicant profile context: {safe_fields}")
+
     parts.append(
-        "\nIMPORTANT: Use [PLACEHOLDER_NAME] for any missing details. "
-        "DO NOT fabricate IDs, dates, or references."
+        "\nIMPORTANT:"
+        "\n- Use the provided applicant information directly."
+        "\n- Do NOT create placeholders for information that is already provided."
+        "\n- Use [PLACEHOLDER_NAME] only when information is genuinely missing."
+        "\n- Do NOT fabricate IDs, dates, addresses, phone numbers, or references."
     )
+
     return "\n".join(parts)
 
 
 def _fallback_draft(request: DraftRequest):
     """Return a safe fallback draft when Bedrock is unavailable."""
     if request.draft_type == DraftType.grievance:
-        subject = "Grievance Regarding [SCHEME_NAME]"
+        profile = request.profile_context or {}
+
+        name = profile.get("name") or "[APPLICANT_NAME]"
+        district = profile.get("district") or "[DISTRICT]"
+        state = profile.get("state") or "[STATE]"
+        scheme_name = request.scheme_name or "[SCHEME_NAME]"
+        department_name = request.department_name or "[DEPARTMENT_NAME]"
+        subject = f"Grievance Regarding {scheme_name}"
+
         body = (
-            "To,\nThe Competent Authority,\n[DEPARTMENT_NAME]\n[DISTRICT], [STATE]\n\n"
-            "Subject: Grievance regarding [SCHEME_NAME]\n\n"
+            "To,\n"
+            "The Competent Authority,\n"
+            f"{department_name}\n"
+            f"{district}, {state}\n\n"
+            f"Subject: Grievance regarding {scheme_name}\n\n"
             "Respected Sir/Madam,\n\n"
-            "I, [APPLICANT_NAME], resident of [VILLAGE/WARD], [DISTRICT], [STATE], "
-            "wish to bring to your kind attention the following issue:\n\n"
+            f"I, {name}, wish to bring to your kind attention the following issue:\n\n"
             f"{request.user_text}\n\n"
-            "I humbly request you to look into this matter and take appropriate action at the earliest.\n\n"
-            "Thanking you,\n[APPLICANT_NAME]\n[DATE]\nContact: [PHONE_NUMBER]"
+            "I humbly request you to look into this matter and take appropriate action "
+            "at the earliest.\n\n"
+            "Thanking you,\n"
+            f"{name}"
         )
     else:
         subject = "Application for [SCHEME_NAME]"

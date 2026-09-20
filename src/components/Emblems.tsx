@@ -93,6 +93,7 @@ export const DigitalIndiaLogo: React.FC<{ className?: string }> = ({ className =
 
 // PM Narendra Modi Official Showcase Image & Citation
 import { useLanguage } from '../context/LanguageContext.tsx';
+import PmImg from '../public/assets/pm.jpg';
 
 export const PmModiShowcase: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { lang, t } = useLanguage();
@@ -102,7 +103,7 @@ export const PmModiShowcase: React.FC<{ className?: string }> = ({ className = '
       <div className="relative shrink-0">
         <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-2 border-[#F77F00] overflow-hidden shadow-md bg-white">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Prime_Minister_Narendra_Modi_in_2023.jpg/480px-Prime_Minister_Narendra_Modi_in_2023.jpg"
+            src={PmImg}
             alt="Shri Narendra Modi, Hon'ble Prime Minister of India"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-top"

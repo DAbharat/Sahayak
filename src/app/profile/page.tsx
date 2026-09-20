@@ -102,26 +102,86 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column (2 Cols): Profile Verification Card & DigiLocker Docs */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="relative">
-              {isSaving && (
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-[#F77F00] font-bold">
-                    <span className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                    Saving to Go Backend...
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {/* --- ROW 1 --- */}
+          {/* Left: Profile Verification Card */}
+          <div className="lg:col-span-2 relative">
+            {isSaving && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
+                <div className="flex items-center gap-2 text-[#F77F00] font-bold">
+                  <span className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                  Saving to Go Backend...
                 </div>
-              )}
-              <ProfileCard
-                profile={userProfile}
-                onConfirm={handleProfileConfirm}
-              />
-            </div>
+              </div>
+            )}
+            <ProfileCard
+              profile={userProfile}
+              onConfirm={handleProfileConfirm}
+            />
+          </div>
 
-            {/* DigiLocker Digital Document Wallet Integration */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs space-y-3">
+          {/* Right: Primary Matched Schemes */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs flex flex-col h-full space-y-4">
+              <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider pb-2 border-b border-gray-100">
+                Primary Matched Schemes
+              </h3>
+
+              <div className="space-y-3 flex-1">
+                <div
+                  onClick={() => onSelectScheme('pm-svanidhi')}
+                  className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-50 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                    <span>PM SVANidhi Loan</span>
+                    <span className="text-emerald-700">🟢 May qualify</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 mt-1">
+                    Up to ₹50,000 working capital loan with 7% interest subsidy.
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => onSelectScheme('ayushman-bharat')}
+                  className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-50 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                    <span>Ayushman Bharat (PM-JAY)</span>
+                    <span className="text-emerald-700">🟢 May qualify</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 mt-1">
+                    ₹5,00,000 cashless medical protection for your 4 family members.
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => onSelectScheme('pm-vishwakarma')}
+                  className="p-3 rounded-lg border border-amber-200 bg-amber-50/60 hover:bg-amber-50 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+                    <span>PM Vishwakarma</span>
+                    <span className="text-amber-700">🟡 Need Info</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 mt-1">
+                    Requires verification under 18 traditional craft trades.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onNavigate('/schemes')}
+                className="w-full py-2 text-center text-xs font-bold text-[#006400] hover:underline mt-auto"
+              >
+                View Complete Schemes Catalog →
+              </button>
+            </div>
+          </div>
+
+          {/* --- ROW 2 --- */}
+          {/* Left: DigiLocker Docs */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs space-y-3 h-full">
               <div className="flex items-center justify-between pb-2 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-[#006400]" />
@@ -170,76 +230,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           </div>
 
-          {/* Right Column (1 Col): Top Matched Schemes & Grievance Shortcuts */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs space-y-4">
-              <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider pb-2 border-b border-gray-100">
-                Primary Matched Schemes
-              </h3>
-
-              <div className="space-y-3">
-                <div
-                  onClick={() => onSelectScheme('pm-svanidhi')}
-                  className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
-                    <span>PM SVANidhi Loan</span>
-                    <span className="text-emerald-700">🟢 May qualify</span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800 mt-1">
-                    Up to ₹50,000 working capital loan with 7% interest subsidy.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => onSelectScheme('ayushman-bharat')}
-                  className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
-                    <span>Ayushman Bharat (PM-JAY)</span>
-                    <span className="text-emerald-700">🟢 May qualify</span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800 mt-1">
-                    ₹5,00,000 cashless medical protection for your 4 family members.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => onSelectScheme('pm-vishwakarma')}
-                  className="p-3 rounded-lg border border-amber-200 bg-amber-50/60 hover:bg-amber-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center justify-between text-xs font-bold text-amber-900">
-                    <span>PM Vishwakarma</span>
-                    <span className="text-amber-700">🟡 Need Info</span>
-                  </div>
-                  <p className="text-[11px] text-amber-800 mt-1">
-                    Requires verification under 18 traditional craft trades.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onNavigate('/schemes')}
-                className="w-full py-2 text-center text-xs font-bold text-[#006400] hover:underline"
-              >
-                View Complete Schemes Catalog →
-              </button>
-            </div>
-
-            {/* Quick Grievance Draft Card */}
-            <div className="bg-orange-50 rounded-xl border border-orange-200 p-5 space-y-3">
+          {/* Right: Grievance Quick Action */}
+          <div className="lg:col-span-1">
+            <div className="bg-orange-50 rounded-xl border border-orange-200 p-5 flex flex-col h-full space-y-3">
               <div className="flex items-center gap-2 text-orange-950 font-bold text-sm">
                 <FileText className="w-4 h-4 text-[#F77F00]" />
                 <span>Grievance Quick Action</span>
               </div>
-              <p className="text-xs text-orange-900 leading-relaxed">
+              <p className="text-xs text-orange-900 leading-relaxed flex-1">
                 Need to follow up on a pending application or file an inquiry? Generate an official grievance representation letter.
               </p>
               <button
                 type="button"
                 onClick={() => onNavigate('/grievance')}
-                className="w-full py-2.5 rounded-lg bg-[#F77F00] text-white text-xs font-bold hover:bg-[#d96e00] transition-colors shadow-xs"
+                className="w-full py-2.5 rounded-lg bg-[#F77F00] text-white text-xs font-bold hover:bg-[#d96e00] transition-colors shadow-xs mt-auto"
               >
                 Draft Grievance Now
               </button>
